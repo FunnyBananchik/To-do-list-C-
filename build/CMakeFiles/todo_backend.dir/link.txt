@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/todo_backend.dir/src/main.cpp.o CMakeFiles/todo_backend.dir/src/AuthService.cpp.o  -o todo_backend /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so -lsqlite3 -lpthread 

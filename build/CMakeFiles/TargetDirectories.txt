@@ -1,0 +1,3 @@
+/home/user/todo-backend/build/CMakeFiles/rebuild_cache.dir
+/home/user/todo-backend/build/CMakeFiles/todo_backend.dir
+/home/user/todo-backend/build/CMakeFiles/edit_cache.dir

@@ -1,0 +1,1617 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo App - Менеджер задач</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Аутентификация */
+        .auth-container {
+            max-width: 400px;
+            margin: 50px auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .auth-tab {
+            flex: 1;
+            padding: 12px;
+            background: none;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #718096;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .auth-tab.active {
+            color: #5a67d8;
+            border-bottom: 3px solid #5a67d8;
+            margin-bottom: -2px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: border-color 0.3s;
+        }
+        
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #5a67d8;
+        }
+        
+        .form-textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, #5a67d8, #4c51bf);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(to right, #4c51bf, #434190);
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #48bb78;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #38a169;
+        }
+        
+        .btn-warning {
+            background: #f6ad55;
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background: #ed8936;
+        }
+        
+        .btn-danger {
+            background: #f56565;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #e53e3e;
+        }
+        
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+        }
+        
+        .btn-full {
+            width: 100%;
+        }
+        
+        /* Основной интерфейс */
+        .app-header {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #5a67d8;
+            font-weight: 600;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .card h2 {
+            color: #5a67d8;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card h2 i {
+            font-size: 1.2rem;
+        }
+        
+        /* Список задач */
+        .todos-container {
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        
+        .todo-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 5px solid #5a67d8;
+            transition: all 0.3s;
+        }
+        
+        .todo-item.completed {
+            opacity: 0.7;
+            border-left-color: #48bb78;
+        }
+        
+        .todo-item.overdue {
+            border-left-color: #f56565;
+        }
+        
+        .todo-item.expiring {
+            border-left-color: #f6ad55;
+        }
+        
+        .todo-item:hover {
+            background: #edf2f7;
+            transform: translateX(5px);
+        }
+        
+        .todo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+        
+        .todo-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+            word-break: break-word;
+        }
+        
+        .todo-actions {
+            display: flex;
+            gap: 6px;
+        }
+        
+        .todo-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 0.85rem;
+            color: #718096;
+            margin-top: 10px;
+        }
+        
+        .todo-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .category-tag {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: white;
+            margin-left: 5px;
+        }
+        
+        /* Форма создания задачи */
+        .create-form .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .create-form .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Уведомления */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+        
+        .notification.success { background: #48bb78; }
+        .notification.error { background: #f56565; }
+        .notification.info { background: #5a67d8; }
+        .notification.warning { background: #f6ad55; }
+        
+        /* Модальное окно */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+        
+        .modal {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #718096;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #5a67d8;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #a0aec0;
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+        
+        /* Статистика */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .stat-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        .stat-box h3 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+        
+        .stat-box p {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+        
+        /* Фильтры */
+        .filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 8px 15px;
+            background: #edf2f7;
+            border: none;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .filter-btn:hover, .filter-btn.active {
+            background: #5a67d8;
+            color: white;
+        }
+        
+        .filter-btn.overdue {
+            background: #fed7d7;
+        }
+        
+        .filter-btn.overdue:hover, .filter-btn.overdue.active {
+            background: #f56565;
+            color: white;
+        }
+        
+        .filter-btn.expiring {
+            background: #feebc8;
+        }
+        
+        .filter-btn.expiring:hover, .filter-btn.expiring.active {
+            background: #f6ad55;
+            color: white;
+        }
+        
+        /* Фильтры по категориям */
+        .category-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .category-filter-btn {
+            padding: 6px 12px;
+            background: #edf2f7;
+            border: 2px solid transparent;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .category-filter-btn:hover, .category-filter-btn.active {
+            border-color: #5a67d8;
+            transform: translateY(-2px);
+        }
+        
+        .category-filter-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        /* Категории */
+        .categories-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+        
+        .category-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            margin-bottom: 5px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+        
+        .category-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .category-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 5px;
+        }
+        
+        .category-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .category-form {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .priority-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-left: 5px;
+        }
+        
+        .priority-1 { background: #c6f6d5; color: #22543d; }
+        .priority-2 { background: #d6eaf8; color: #1e3a8a; }
+        .priority-3 { background: #fefcbf; color: #744210; }
+        .priority-4 { background: #fed7d7; color: #c53030; }
+        .priority-5 { background: #e9d8fd; color: #553c9a; }
+        
+        .clear-filters-btn {
+            background: #e2e8f0;
+            color: #4a5568;
+            font-size: 0.85rem;
+            padding: 4px 10px;
+            border-radius: 15px;
+            border: none;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        
+        .clear-filters-btn:hover {
+            background: #cbd5e0;
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+
+    <script>
+        class TodoApp {
+            constructor() {
+                this.baseUrl = 'http://localhost:8080';
+                this.token = localStorage.getItem('auth_token');
+                this.currentUser = null;
+                this.todos = [];
+                this.categories = [];
+                this.expiringTodos = [];
+                this.stats = null;
+                this.filter = 'all';
+                this.selectedCategoryIds = [];
+                this.editingTodo = null;
+                this.currentView = this.token ? 'main' : 'auth';
+                this.init();
+            }
+            
+            init() {
+                if (this.token) {
+                    this.validateToken();
+                } else {
+                    this.render();
+                }
+            }
+            
+            async validateToken() {
+                try {
+                    const response = await fetch(`${this.baseUrl}/api/validate`, {
+                        headers: {
+                            'Authorization': `Bearer ${this.token}`
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.valid) {
+                            this.currentUser = {
+                                id: data.user_id,
+                                username: data.username
+                            };
+                            this.loadData();
+                        } else {
+                            this.logout();
+                        }
+                    } else {
+                        this.logout();
+                    }
+                } catch (error) {
+                    console.error('Ошибка проверки токена:', error);
+                    this.logout();
+                }
+            }
+            
+            async loadData() {
+                await Promise.all([
+                    this.fetchTodos(),
+                    this.fetchCategories(),
+                    this.fetchExpiringTodos(),
+                    this.fetchStats()
+                ]);
+                this.render();
+            }
+            
+            async fetchTodos() {
+                try {
+                    let url = `${this.baseUrl}/api/todos`;
+                    const params = [];
+                    
+                    if (this.filter === 'overdue') {
+                        params.push('overdue=true');
+                    }
+                    
+                    if (this.selectedCategoryIds.length > 0) {
+                        params.push(`category_ids=${this.selectedCategoryIds.join(',')}`);
+                    }
+                    
+                    if (params.length > 0) {
+                        url += '?' + params.join('&');
+                    }
+                    
+                    const response = await fetch(url, {
+                        headers: {
+                            'Authorization': `Bearer ${this.token}`
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        this.todos = await response.json();
+                    }
+                } catch (error) {
+                    console.error('Ошибка загрузки задач:', error);
+                    this.showNotification('Ошибка загрузки задач', 'error');
+                }
+            }
+            
+            async fetchCategories() {
+                try {
+                    const response = await fetch(`${this.baseUrl}/api/categories`, {
+                        headers: {
+                            'Authorization': `Bearer ${this.token}`
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        this.categories = await response.json();
+                    }
+                } catch (error) {
+                    console.error('Ошибка загрузки категорий:', error);
+                }
+            }
+            
+            async fetchExpiringTodos() {
+                try {
+                    const response = await fetch(`${this.baseUrl}/api/todos/expiration`, {
+                        headers: {
+                            'Authorization': `Bearer ${this.token}`
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        this.expiringTodos = await response.json();
+                    }
+                } catch (error) {
+                    console.error('Ошибка загрузки истекающих задач:', error);
+                }
+            }
+            
+            async fetchStats() {
+                try {
+                    const response = await fetch(`${this.baseUrl}/api/stats`, {
+                        headers: {
+                            'Authorization': `Bearer ${this.token}`
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        this.stats = await response.json();
+                    }
+                } catch (error) {
+                    console.error('Ошибка загрузки статистики:', error);
+                }
+            }
+            
+            async login(username, password) {
+                try {
+                    const response = await fetch(`${this.baseUrl}/api/login`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ username, password })
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        this.token = data.token;
+                        localStorage.setItem('auth_token', this.token);
+                        this.currentUser = {
+                            id: data.id,
+                            username: data.username
+                        };
+                        this.showNotification('Вход выполнен успешно!', 'success');
+                        await this.loadData();
+                        this.currentView = 'main';
+                        this.render();
+                    } else {
+                        const error = await response.json();
+                        throw new Error(error.error || 'Ошибка входа');
+                    }
+                } catch (error) {
+                    this.showNotification(error.message, 'error');
+                }
+            }
+            
+            async register(username, password) {
+                try {
+                    const response = await fetch(`${this.baseUrl}/api/register`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ username, password })
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        this.token = data.token;
+                        localStorage.setItem('auth_token', this.token);
+                        this.currentUser = {
+                            id: data.id,
+                            username: data.username
+                        };
+                        this.showNotification('Регистрация успешна!', 'success');
+                        await this.loadData();
+                        this.currentView = 'main';
+                        this.render();
+                    } else {
+                        const error = await response.json();
+                        throw new Error(error.error || 'Ошибка регистрации');
+                    }
+                } catch (error) {
+                    this.showNotification(error.message, 'error');
+                }
+            }
+            
+            logout() {
+                localStorage.removeItem('auth_token');
+                this.token = null;
+                this.currentUser = null;
+                this.todos = [];
+                this.categories = [];
+                this.expiringTodos = [];
+                this.stats = null;
+                this.selectedCategoryIds = [];
+                this.editingTodo = null;
+                this.currentView = 'auth';
+                this.render();
+                this.showNotification('Выход выполнен', 'info');
+            }
+            
+            async createTodo(todoData) {
+                try {
+                    const response = await fetch(`${this.baseUrl}/api/todos`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${this.token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(todoData)
+                    });
+                    
+                    if (response.ok) {
+                        const newTodo = await response.json();
+                        this.todos.unshift(newTodo);
+                        this.showNotification('Задача создана!', 'success');
+                        await this.fetchStats();
+                        await this.fetchExpiringTodos();
+                        return true;
+                    } else {
+                        const error = await response.json();
+                        throw new Error(error.error || 'Ошибка создания задачи');
+                    }
+                } catch (error) {
+                    this.showNotification(error.message, 'error');
+                    return false;
+                }
+            }
+            
+            async updateTodo(todoData) {
+                try {
+                    const response = await fetch(`${this.baseUrl}/api/todos/${todoData.id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${this.token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(todoData)
+                    });
+                    
+                    if (response.ok) {
+                        const updatedTodo = await response.json();
+                        const index = this.todos.findIndex(t => t.id === todoData.id);
+                        if (index !== -1) {
+                            this.todos[index] = updatedTodo;
+                        }
+                        this.showNotification('Задача обновлена!', 'success');
+                        await this.fetchStats();
+                        await this.fetchExpiringTodos();
+                        return true;
+                    } else {
+                        const error = await response.json();
+                        throw new Error(error.error || 'Ошибка обновления задачи');
+                    }
+                } catch (error) {
+                    this.showNotification(error.message, 'error');
+                    return false;
+                }
+            }
+            
+            async createCategory(categoryData) {
+                try {
+                    const response = await fetch(`${this.baseUrl}/api/categories`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${this.token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(categoryData)
+                    });
+                    
+                    if (response.ok) {
+                        const newCategory = await response.json();
+                        this.categories.push(newCategory);
+                        this.showNotification('Категория создана!', 'success');
+                        return true;
+                    } else {
+                        const error = await response.json();
+                        throw new Error(error.error || 'Ошибка создания категории');
+                    }
+                } catch (error) {
+                    this.showNotification(error.message, 'error');
+                    return false;
+                }
+            }
+            
+            async deleteCategory(id, name) {
+                if (!confirm(`Удалить категорию "${name}"? Все задачи в этой категории останутся без категории.`)) return;
+                
+                try {
+                    const response = await fetch(`${this.baseUrl}/api/categories/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${this.token}`
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        this.categories = this.categories.filter(c => c.id !== id);
+                        // Удаляем категорию из выбранных фильтров
+                        this.selectedCategoryIds = this.selectedCategoryIds.filter(catId => catId !== id);
+                        this.showNotification('Категория удалена', 'success');
+                        await this.fetchTodos();
+                    }
+                } catch (error) {
+                    this.showNotification('Ошибка удаления категории', 'error');
+                }
+            }
+            
+            async toggleTodo(id) {
+                try {
+                    const response = await fetch(`${this.baseUrl}/api/todos/${id}/toggle`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Authorization': `Bearer ${this.token}`
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const updatedTodo = await response.json();
+                        const index = this.todos.findIndex(t => t.id === id);
+                        if (index !== -1) {
+                            this.todos[index] = updatedTodo;
+                        }
+                        await this.fetchStats();
+                        await this.fetchExpiringTodos();
+                        return true;
+                    }
+                } catch (error) {
+                    this.showNotification('Ошибка обновления задачи', 'error');
+                    return false;
+                }
+            }
+            
+            async deleteTodo(id) {
+                if (!confirm('Удалить задачу?')) return;
+                
+                try {
+                    const response = await fetch(`${this.baseUrl}/api/todos/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${this.token}`
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        this.todos = this.todos.filter(t => t.id !== id);
+                        this.showNotification('Задача удалена', 'success');
+                        await this.fetchStats();
+                        await this.fetchExpiringTodos();
+                    }
+                } catch (error) {
+                    this.showNotification('Ошибка удаления задачи', 'error');
+                }
+            }
+            
+            showNotification(message, type = 'info') {
+                const existing = document.querySelector('.notification');
+                if (existing) existing.remove();
+                
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.textContent = message;
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, 3000);
+            }
+            
+            isOverdue(todo) {
+                if (!todo.due_date || todo.completed) return false;
+                const dueDate = new Date(todo.due_date);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                return dueDate < today;
+            }
+            
+            isExpiring(todo) {
+                if (!todo.due_date || todo.completed || this.isOverdue(todo)) return false;
+                const dueDate = new Date(todo.due_date);
+                const today = new Date();
+                const threeDaysFromNow = new Date();
+                threeDaysFromNow.setDate(today.getDate() + 3);
+                return dueDate <= threeDaysFromNow && dueDate >= today;
+            }
+            
+            getCategoryName(categoryId) {
+                if (!categoryId || categoryId === 0) return null;
+                const category = this.categories.find(c => c.id === categoryId);
+                return category ? category.name : 'Неизвестная категория';
+            }
+            
+            getCategoryColor(categoryId) {
+                if (!categoryId || categoryId === 0) return '#6b7280';
+                const category = this.categories.find(c => c.id === categoryId);
+                return category ? category.color : '#6b7280';
+            }
+            
+            getPriorityClass(priority) {
+                return `priority-${priority}`;
+            }
+            
+            formatDate(dateString) {
+                if (!dateString) return 'Не указано';
+                const date = new Date(dateString);
+                return date.toLocaleDateString('ru-RU', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            }
+            
+            toggleCategoryFilter(categoryId) {
+                if (this.selectedCategoryIds.includes(categoryId)) {
+                    this.selectedCategoryIds = this.selectedCategoryIds.filter(id => id !== categoryId);
+                } else {
+                    this.selectedCategoryIds.push(categoryId);
+                }
+                this.fetchTodos().then(() => this.render());
+            }
+            
+            clearCategoryFilters() {
+                this.selectedCategoryIds = [];
+                this.fetchTodos().then(() => this.render());
+            }
+            
+            renderAuth() {
+                return `
+                    <div class="auth-container">
+                        <h2 style="text-align: center; color: #5a67d8; margin-bottom: 25px;">
+                            <i class="fas fa-tasks"></i> Todo App
+                        </h2>
+                        
+                        <div class="auth-tabs" id="authTabs">
+                            <button class="auth-tab active" data-tab="login">Вход</button>
+                            <button class="auth-tab" data-tab="register">Регистрация</button>
+                        </div>
+                        
+                        <form id="loginForm">
+                            <div class="form-group">
+                                <label>Имя пользователя</label>
+                                <input type="text" class="form-input" id="loginUsername" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Пароль</label>
+                                <input type="password" class="form-input" id="loginPassword" required>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary btn-full">
+                                <i class="fas fa-sign-in-alt"></i> Войти
+                            </button>
+                        </form>
+                        
+                        <form id="registerForm" style="display: none;">
+                            <div class="form-group">
+                                <label>Имя пользователя</label>
+                                <input type="text" class="form-input" id="registerUsername" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Пароль</label>
+                                <input type="password" class="form-input" id="registerPassword" required>
+                                <small style="color: #718096; font-size: 0.8rem;">
+                                    Минимум 6 символов, буквы и цифры
+                                </small>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary btn-full">
+                                <i class="fas fa-user-plus"></i> Зарегистрироваться
+                            </button>
+                        </form>
+                        
+                        <div style="margin-top: 20px; text-align: center; color: #718096; font-size: 0.9rem;">
+                            <p>Тестовый пользователь:</p>
+                            <p><strong>admin / admin123</strong></p>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            renderMain() {
+                const filteredTodos = this.getFilteredTodos();
+                const hasExpiringTodos = this.expiringTodos && this.expiringTodos.length > 0;
+                const hasSelectedCategories = this.selectedCategoryIds.length > 0;
+                
+                return `
+                    <div class="container">
+                        <header class="app-header">
+                            <h1><i class="fas fa-tasks"></i> Todo App</h1>
+                            <div class="user-info">
+                                <i class="fas fa-user-circle"></i>
+                                ${this.currentUser.username}
+                                <button class="btn btn-sm btn-danger" id="logoutBtn">
+                                    <i class="fas fa-sign-out-alt"></i> Выход
+                                </button>
+                            </div>
+                        </header>
+                        
+                        <div class="main-content">
+                            <!-- Левая колонка -->
+                            <div>
+                                <!-- Форма создания задачи -->
+                                <div class="card">
+                                    <h2><i class="fas fa-plus-circle"></i> Новая задача</h2>
+                                    <form id="createTodoForm" class="create-form">
+                                        <div class="form-group">
+                                            <label>Заголовок *</label>
+                                            <input type="text" class="form-input" id="todoTitle" required>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label>Описание</label>
+                                            <textarea class="form-textarea" id="todoDescription" rows="3"></textarea>
+                                        </div>
+                                        
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <label>Приоритет</label>
+                                                <select class="form-select" id="todoPriority">
+                                                    <option value="1">Низкий</option>
+                                                    <option value="2">Средний</option>
+                                                    <option value="3">Высокий</option>
+                                                    <option value="4">Срочный</option>
+                                                    <option value="5">Критичный</option>
+                                                </select>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label>Срок выполнения</label>
+                                                <input type="date" class="form-input" id="todoDueDate">
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label>Категория</label>
+                                            <select class="form-select" id="todoCategory">
+                                                <option value="0">Без категории</option>
+                                                ${this.categories.map(cat => `
+                                                    <option value="${cat.id}">${cat.name}</option>
+                                                `).join('')}
+                                            </select>
+                                        </div>
+                                        
+                                        <button type="submit" class="btn btn-primary btn-full">
+                                            <i class="fas fa-save"></i> Создать задачу
+                                        </button>
+                                    </form>
+                                </div>
+                                
+                                <!-- Управление категориями -->
+                                <div class="card">
+                                    <h2><i class="fas fa-tags"></i> Категории</h2>
+                                    
+                                    <div class="category-form">
+                                        <input type="text" class="form-input" id="categoryName" placeholder="Название категории" required>
+                                        <input type="color" class="form-input" id="categoryColor" value="#667eea" style="padding: 5px; height: 42px;">
+                                        <button type="button" class="btn btn-primary" id="createCategoryBtn">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="categories-list">
+                                        ${this.categories.length === 0 ? `
+                                            <div class="empty-state" style="padding: 10px;">
+                                                <p>Нет категорий</p>
+                                            </div>
+                                        ` : this.categories.map(cat => `
+                                            <div class="category-item" style="border-left-color: ${cat.color}">
+                                                <div class="category-color" style="background-color: ${cat.color}"></div>
+                                                <div style="font-weight: 600;">${cat.name}</div>
+                                                <div class="category-actions">
+                                                    <button class="btn btn-sm btn-danger" data-category-id="${cat.id}" data-category-name="${cat.name}" data-action="delete-category">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                                
+                                <!-- Статистика -->
+                                ${this.stats ? `
+                                <div class="card">
+                                    <h2><i class="fas fa-chart-bar"></i> Статистика</h2>
+                                    <div class="stats">
+                                        <div class="stat-box">
+                                            <h3>${this.stats.total}</h3>
+                                            <p>Всего задач</p>
+                                        </div>
+                                        <div class="stat-box">
+                                            <h3>${this.stats.completed}</h3>
+                                            <p>Выполнено</p>
+                                        </div>
+                                        <div class="stat-box">
+                                            <h3>${this.stats.pending}</h3>
+                                            <p>В работе</p>
+                                        </div>
+                                    </div>
+                                    
+                                    ${hasExpiringTodos ? `
+                                        <div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid #e9ecef;">
+                                            <h3><i class="fas fa-clock"></i> Истекающие задачи (${this.expiringTodos.length})</h3>
+                                            <div style="margin-top: 10px; max-height: 150px; overflow-y: auto;">
+                                                ${this.expiringTodos.slice(0, 3).map(todo => `
+                                                    <div style="background: #f6ad55; color: white; padding: 8px; border-radius: 5px; margin-bottom: 5px; font-size: 0.9rem;">
+                                                        <div style="font-weight: bold;">${todo.title}</div>
+                                                        <div style="font-size: 0.8rem;">
+                                                            Срок: ${this.formatDate(todo.due_date)} | Приоритет: ${todo.priority}
+                                                        </div>
+                                                    </div>
+                                                `).join('')}
+                                                ${this.expiringTodos.length > 3 ? `
+                                                    <div style="text-align: center; margin-top: 5px; color: #f6ad55;">
+                                                        + еще ${this.expiringTodos.length - 3} задач
+                                                    </div>
+                                                ` : ''}
+                                            </div>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                                ` : ''}
+                            </div>
+                            
+                            <!-- Правая колонка -->
+                            <div class="card">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                                    <h2><i class="fas fa-list-check"></i> Мои задачи (${filteredTodos.length})</h2>
+                                    
+                                    <div class="filters">
+                                        <button class="filter-btn ${this.filter === 'all' ? 'active' : ''}" data-filter="all">
+                                            <i class="fas fa-list"></i> Все
+                                        </button>
+                                        <button class="filter-btn ${this.filter === 'pending' ? 'active' : ''}" data-filter="pending">
+                                            <i class="fas fa-spinner"></i> Активные
+                                        </button>
+                                        <button class="filter-btn ${this.filter === 'completed' ? 'active' : ''}" data-filter="completed">
+                                            <i class="fas fa-check"></i> Выполненные
+                                        </button>
+                                        <button class="filter-btn overdue ${this.filter === 'overdue' ? 'active' : ''}" data-filter="overdue">
+                                            <i class="fas fa-exclamation-triangle"></i> Просроченные
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Фильтры по категориям -->
+                                <div style="margin-bottom: 15px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                        <label style="font-weight: 600; color: #495057;">
+                                            Фильтр по категориям:
+                                        </label>
+                                        ${hasSelectedCategories ? `
+                                            <button class="clear-filters-btn" id="clearCategoryFiltersBtn">
+                                                <i class="fas fa-times"></i> Сбросить
+                                            </button>
+                                        ` : ''}
+                                    </div>
+                                    <div class="category-filters">
+                                        ${this.categories.map(cat => `
+                                            <button class="category-filter-btn ${this.selectedCategoryIds.includes(cat.id) ? 'active' : ''}" 
+                                                    data-category-id="${cat.id}"
+                                                    style="${this.selectedCategoryIds.includes(cat.id) ? `border-color: ${cat.color};` : ''}">
+                                                <div class="category-filter-color" style="background-color: ${cat.color}"></div>
+                                                ${cat.name}
+                                                ${this.selectedCategoryIds.includes(cat.id) ? '<i class="fas fa-check"></i>' : ''}
+                                            </button>
+                                        `).join('')}
+                                    </div>
+                                    ${hasSelectedCategories ? `
+                                        <div style="font-size: 0.85rem; color: #718096; margin-top: 5px;">
+                                            Выбрано: ${this.selectedCategoryIds.length} категорий
+                                        </div>
+                                    ` : ''}
+                                </div>
+                                
+                                <div class="todos-container" id="todosList">
+                                    ${filteredTodos.length === 0 ? `
+                                        <div class="empty-state">
+                                            <i class="fas fa-clipboard-list"></i>
+                                            <h3>Задачи не найдены</h3>
+                                            <p>${this.filter === 'all' ? 'Создайте свою первую задачу!' : 
+                                                this.filter === 'pending' ? 'Нет активных задач' : 
+                                                this.filter === 'completed' ? 'Нет выполненных задач' :
+                                                'Нет просроченных задач'}</p>
+                                        </div>
+                                    ` : filteredTodos.map(todo => {
+                                        const overdue = this.isOverdue(todo);
+                                        const expiring = this.isExpiring(todo);
+                                        const categoryName = this.getCategoryName(todo.category_id);
+                                        const categoryColor = this.getCategoryColor(todo.category_id);
+                                        
+                                        return `
+                                        <div class="todo-item ${todo.completed ? 'completed' : ''} ${overdue ? 'overdue' : ''} ${expiring ? 'expiring' : ''}" data-id="${todo.id}">
+                                            <div class="todo-header">
+                                                <div class="todo-title">
+                                                    ${todo.completed ? `<s>${todo.title}</s>` : todo.title}
+                                                    ${overdue && !todo.completed && `
+                                                        <span style="margin-left: 10px; font-size: 0.8rem; color: #f56565;">
+                                                            <i class="fas fa-exclamation-triangle"></i> Просрочено
+                                                        </span>
+                                                    `}
+                                                    ${expiring && !todo.completed && !overdue && `
+                                                        <span style="margin-left: 10px; font-size: 0.8rem; color: #f6ad55;">
+                                                            <i class="fas fa-clock"></i> Истекает
+                                                        </span>
+                                                    `}
+                                                </div>
+                                                <div class="todo-actions">
+                                                    <button class="btn btn-sm ${todo.completed ? 'btn-secondary' : 'btn-primary'}" 
+                                                            data-action="toggle" 
+                                                            title="${todo.completed ? 'Возобновить' : 'Завершить'}">
+                                                        <i class="fas fa-${todo.completed ? 'redo' : 'check'}"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-warning" 
+                                                            data-action="edit" 
+                                                            title="Редактировать">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-danger" 
+                                                            data-action="delete" 
+                                                            title="Удалить">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            
+                                            ${todo.description ? `
+                                                <div style="color: #718096; margin: 8px 0; font-size: 0.95rem;">
+                                                    ${todo.description}
+                                                </div>
+                                            ` : ''}
+                                            
+                                            <div class="todo-meta">
+                                                <div class="todo-meta-item">
+                                                    <i class="fas fa-flag"></i>
+                                                    <span class="priority-badge ${this.getPriorityClass(todo.priority)}">
+                                                        Приоритет: ${todo.priority}
+                                                    </span>
+                                                </div>
+                                                ${categoryName ? `
+                                                    <div class="todo-meta-item">
+                                                        <i class="fas fa-tag"></i>
+                                                        <span class="category-tag" style="background-color: ${categoryColor}">
+                                                            ${categoryName}
+                                                        </span>
+                                                    </div>
+                                                ` : ''}
+                                                <div class="todo-meta-item">
+                                                    <i class="fas fa-calendar-alt"></i>
+                                                    <span>Создано: ${this.formatDate(todo.created_at)}</span>
+                                                </div>
+                                                ${todo.due_date ? `
+                                                    <div class="todo-meta-item">
+                                                        <i class="fas fa-clock"></i>
+                                                        <span>Срок: ${this.formatDate(todo.due_date)}</span>
+                                                    </div>
+                                                ` : ''}
+                                            </div>
+                                        </div>
+                                    `}).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Модальное окно редактирования -->
+                    ${this.editingTodo ? `
+                    <div class="modal-overlay" id="editModal">
+                        <div class="modal">
+                            <div class="modal-header">
+                                <h2><i class="fas fa-edit"></i> Редактирование задачи</h2>
+                                <button class="modal-close" id="closeEditModal">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            
+                            <form id="editTodoForm">
+                                <div class="form-group">
+                                    <label>Заголовок *</label>
+                                    <input type="text" class="form-input" id="editTodoTitle" value="${this.editingTodo.title}" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Описание</label>
+                                    <textarea class="form-textarea" id="editTodoDescription" rows="3">${this.editingTodo.description || ''}</textarea>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Приоритет</label>
+                                        <select class="form-select" id="editTodoPriority">
+                                            <option value="1" ${this.editingTodo.priority == 1 ? 'selected' : ''}>Низкий</option>
+                                            <option value="2" ${this.editingTodo.priority == 2 ? 'selected' : ''}>Средний</option>
+                                            <option value="3" ${this.editingTodo.priority == 3 ? 'selected' : ''}>Высокий</option>
+                                            <option value="4" ${this.editingTodo.priority == 4 ? 'selected' : ''}>Срочный</option>
+                                            <option value="5" ${this.editingTodo.priority == 5 ? 'selected' : ''}>Критичный</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>Срок выполнения</label>
+                                        <input type="date" class="form-input" id="editTodoDueDate" value="${this.editingTodo.due_date || ''}">
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Категория</label>
+                                    <select class="form-select" id="editTodoCategory">
+                                        <option value="0">Без категории</option>
+                                        ${this.categories.map(cat => `
+                                            <option value="${cat.id}" ${this.editingTodo.category_id == cat.id ? 'selected' : ''}>${cat.name}</option>
+                                        `).join('')}
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label style="display: flex; align-items: center; gap: 10px;">
+                                        <input type="checkbox" id="editTodoCompleted" ${this.editingTodo.completed ? 'checked' : ''}>
+                                        Задача выполнена
+                                    </label>
+                                </div>
+                                
+                                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                                    <button type="submit" class="btn btn-primary" style="flex: 1;">
+                                        <i class="fas fa-save"></i> Сохранить
+                                    </button>
+                                    <button type="button" class="btn btn-danger" id="cancelEditBtn">
+                                        <i class="fas fa-times"></i> Отмена
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    ` : ''}
+                `;
+            }
+            
+            getFilteredTodos() {
+                return this.todos;
+            }
+            
+            render() {
+                const app = document.getElementById('app');
+                
+                switch (this.currentView) {
+                    case 'auth':
+                        app.innerHTML = this.renderAuth();
+                        this.setupAuthListeners();
+                        break;
+                    case 'main':
+                        app.innerHTML = this.renderMain();
+                        this.setupMainListeners();
+                        break;
+                }
+            }
+            
+            setupAuthListeners() {
+                document.querySelectorAll('.auth-tab').forEach(tab => {
+                    tab.addEventListener('click', (e) => {
+                        document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+                        e.target.classList.add('active');
+                        
+                        const tabName = e.target.dataset.tab;
+                        document.getElementById('loginForm').style.display = tabName === 'login' ? 'block' : 'none';
+                        document.getElementById('registerForm').style.display = tabName === 'register' ? 'block' : 'none';
+                    });
+                });
+                
+                document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const username = document.getElementById('loginUsername').value;
+                    const password = document.getElementById('loginPassword').value;
+                    await this.login(username, password);
+                });
+                
+                document.getElementById('registerForm')?.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const username = document.getElementById('registerUsername').value;
+                    const password = document.getElementById('registerPassword').value;
+                    await this.register(username, password);
+                });
+            }
+            
+            setupMainListeners() {
+                // Выход
+                document.getElementById('logoutBtn')?.addEventListener('click', () => {
+                    this.logout();
+                });
+                
+                // Основные фильтры
+                document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        this.filter = e.target.dataset.filter;
+                        this.fetchTodos().then(() => this.render());
+                    });
+                });
+                
+                // Фильтры по категориям
+                document.querySelectorAll('.category-filter-btn[data-category-id]').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const categoryId = parseInt(e.target.closest('button').dataset.categoryId);
+                        this.toggleCategoryFilter(categoryId);
+                    });
+                });
+                
+                // Сброс фильтров категорий
+                document.getElementById('clearCategoryFiltersBtn')?.addEventListener('click', () => {
+                    this.clearCategoryFilters();
+                });
+                
+                // Создание задачи
+                document.getElementById('createTodoForm')?.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    
+                    const todoData = {
+                        title: document.getElementById('todoTitle').value,
+                        description: document.getElementById('todoDescription').value,
+                        priority: parseInt(document.getElementById('todoPriority').value),
+                        due_date: document.getElementById('todoDueDate').value || '',
+                        category_id: parseInt(document.getElementById('todoCategory').value) || 0
+                    };
+                    
+                    const success = await this.createTodo(todoData);
+                    if (success) {
+                        e.target.reset();
+                        this.render();
+                    }
+                });
+                
+                // Создание категории
+                document.getElementById('createCategoryBtn')?.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    
+                    const name = document.getElementById('categoryName').value.trim();
+                    const color = document.getElementById('categoryColor').value;
+                    
+                    if (!name) {
+                        this.showNotification('Введите название категории', 'error');
+                        return;
+                    }
+                    
+                    const categoryData = {
+                        name: name,
+                        color: color
+                    };
+                    
+                    const success = await this.createCategory(categoryData);
+                    if (success) {
+                        document.getElementById('categoryName').value = '';
+                        document.getElementById('categoryColor').value = '#667eea';
+                        this.render();
+                    }
+                });
+                
+                // Обработка действий с задачами
+                document.getElementById('todosList')?.addEventListener('click', async (e) => {
+                    const todoItem = e.target.closest('.todo-item');
+                    if (!todoItem) return;
+                    
+                    const todoId = parseInt(todoItem.dataset.id);
+                    const action = e.target.closest('button')?.dataset.action;
+                    
+                    if (action === 'toggle') {
+                        await this.toggleTodo(todoId);
+                        this.render();
+                    } else if (action === 'edit') {
+                        const todo = this.todos.find(t => t.id === todoId);
+                        if (todo) {
+                            this.editingTodo = { ...todo };
+                            this.render();
+                        }
+                    } else if (action === 'delete') {
+                        await this.deleteTodo(todoId);
+                        this.render();
+                    }
+                });
+                
+                // Удаление категорий
+                document.querySelector('.categories-list')?.addEventListener('click', async (e) => {
+                    const deleteBtn = e.target.closest('button[data-action="delete-category"]');
+                    if (!deleteBtn) return;
+                    
+                    const categoryId = parseInt(deleteBtn.dataset.categoryId);
+                    const categoryName = deleteBtn.dataset.categoryName;
+                    await this.deleteCategory(categoryId, categoryName);
+                });
+                
+                // Редактирование задачи
+                if (this.editingTodo) {
+                    document.getElementById('closeEditModal')?.addEventListener('click', () => {
+                        this.editingTodo = null;
+                        this.render();
+                    });
+                    
+                    document.getElementById('cancelEditBtn')?.addEventListener('click', () => {
+                        this.editingTodo = null;
+                        this.render();
+                    });
+                    
+                    document.getElementById('editTodoForm')?.addEventListener('submit', async (e) => {
+                        e.preventDefault();
+                        
+                        const updatedTodo = {
+                            id: this.editingTodo.id,
+                            title: document.getElementById('editTodoTitle').value,
+                            description: document.getElementById('editTodoDescription').value,
+                            priority: parseInt(document.getElementById('editTodoPriority').value),
+                            due_date: document.getElementById('editTodoDueDate').value || '',
+                            category_id: parseInt(document.getElementById('editTodoCategory').value) || 0,
+                            completed: document.getElementById('editTodoCompleted').checked
+                        };
+                        
+                        const success = await this.updateTodo(updatedTodo);
+                        if (success) {
+                            this.editingTodo = null;
+                            this.render();
+                        }
+                    });
+                    
+                    // Закрытие модального окна при клике на оверлей
+                    document.getElementById('editModal')?.addEventListener('click', (e) => {
+                        if (e.target.id === 'editModal') {
+                            this.editingTodo = null;
+                            this.render();
+                        }
+                    });
+                }
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            window.todoApp = new TodoApp();
+        });
+    </script>
+</body>
+</html>
