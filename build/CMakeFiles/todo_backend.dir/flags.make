@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_FLAGS =   -Wall -Wextra -O2 -std=gnu++1z
 
-CXX_DEFINES = 
+CXX_DEFINES = -DSQLITE_ENABLE_FTS5
 
 CXX_INCLUDES = -I/home/user/todo-backend/src -I/home/user/todo-backend/cpp-httplib -I/home/user/todo-backend/jwt-cpp/include -I/home/user/todo-backend/jwt-cpp/include/jwt-cpp 
 

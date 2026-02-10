@@ -141,6 +141,15 @@
             background: #e53e3e;
         }
         
+        .btn-info {
+            background: #4299e1;
+            color: white;
+        }
+        
+        .btn-info:hover {
+            background: #3182ce;
+        }
+        
         .btn-sm {
             padding: 6px 12px;
             font-size: 0.85rem;
@@ -170,6 +179,49 @@
             font-weight: 600;
         }
         
+        .search-container {
+            flex-grow: 1;
+            margin: 0 20px;
+            position: relative;
+        }
+        
+        .search-box {
+            width: 100%;
+            padding: 12px 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            padding-left: 45px;
+        }
+        
+        .search-box:focus {
+            outline: none;
+            border-color: #5a67d8;
+            box-shadow: 0 0 0 3px rgba(90, 103, 216, 0.1);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #718096;
+        }
+        
+        .search-results-count {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #5a67d8;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
         .main-content {
             display: grid;
             grid-template-columns: 1fr 2fr;
@@ -179,6 +231,16 @@
         @media (max-width: 768px) {
             .main-content {
                 grid-template-columns: 1fr;
+            }
+            
+            .app-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .search-container {
+                width: 100%;
+                margin: 10px 0 0 0;
             }
         }
         
@@ -233,6 +295,11 @@
             border-left-color: #f6ad55;
         }
         
+        .todo-item.highlighted {
+            background: #fffde7;
+            box-shadow: 0 2px 8px rgba(255, 235, 59, 0.3);
+        }
+        
         .todo-item:hover {
             background: #edf2f7;
             transform: translateX(5px);
@@ -250,6 +317,12 @@
             font-weight: 600;
             color: #2d3748;
             word-break: break-word;
+        }
+        
+        .todo-title mark {
+            background-color: #ffeb3b;
+            padding: 2px 4px;
+            border-radius: 3px;
         }
         
         .todo-actions {
@@ -280,19 +353,6 @@
             font-weight: 500;
             color: white;
             margin-left: 5px;
-        }
-        
-        /* Форма создания задачи */
-        .create-form .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-        
-        @media (max-width: 768px) {
-            .create-form .form-row {
-                grid-template-columns: 1fr;
-            }
         }
         
         /* Уведомления */
@@ -362,6 +422,17 @@
             text-align: center;
             padding: 20px;
             color: #5a67d8;
+        }
+        
+        .loading i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         
         .empty-state {
@@ -571,6 +642,10 @@
                 this.selectedCategoryIds = [];
                 this.editingTodo = null;
                 this.currentView = this.token ? 'main' : 'auth';
+                this.searchQuery = '';
+                this.searchResults = null;
+                this.isSearching = false;
+                this.searchHistory = JSON.parse(localStorage.getItem('search_history') || '[]');
                 this.init();
             }
             
@@ -700,6 +775,74 @@
                 }
             }
             
+            async performSearch(query) {
+                if (!query || query.trim().length < 2) {
+                    this.showNotification('Введите минимум 2 символа для поиска', 'warning');
+                    return;
+                }
+                
+                console.log('Выполняю поиск:', query);
+                
+                this.isSearching = true;
+                this.searchQuery = query;
+                this.render();
+                
+                try {
+                    const response = await fetch(`${this.baseUrl}/api/todos/search?q=${encodeURIComponent(query)}&highlight=true`, {
+                        headers: {
+                            'Authorization': `Bearer ${this.token}`
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        this.searchResults = await response.json();
+                        console.log('Результаты поиска:', this.searchResults);
+                        
+                        // Сохраняем в историю поиска
+                        this.addToSearchHistory(query);
+                        
+                        if (this.searchResults.count > 0) {
+                            this.showNotification(`Найдено ${this.searchResults.count} задач`, 'success');
+                        } else {
+                            this.showNotification('Ничего не найдено', 'info');
+                        }
+                    } else {
+                        const error = await response.json();
+                        throw new Error(error.error || 'Ошибка поиска');
+                    }
+                } catch (error) {
+                    console.error('Ошибка поиска:', error);
+                    this.showNotification('Ошибка при выполнении поиска', 'error');
+                    this.searchResults = null;
+                }
+                
+                this.isSearching = false;
+                this.render();
+            }
+            
+            addToSearchHistory(query) {
+                // Удаляем дубликаты
+                this.searchHistory = this.searchHistory.filter(item => item !== query);
+                
+                // Добавляем в начало
+                this.searchHistory.unshift(query);
+                
+                // Ограничиваем историю 10 последними запросами
+                if (this.searchHistory.length > 10) {
+                    this.searchHistory = this.searchHistory.slice(0, 10);
+                }
+                
+                // Сохраняем в localStorage
+                localStorage.setItem('search_history', JSON.stringify(this.searchHistory));
+            }
+            
+            clearSearch() {
+                this.searchQuery = '';
+                this.searchResults = null;
+                this.isSearching = false;
+                this.render();
+            }
+            
             async login(username, password) {
                 try {
                     const response = await fetch(`${this.baseUrl}/api/login`, {
@@ -764,6 +907,7 @@
             
             logout() {
                 localStorage.removeItem('auth_token');
+                localStorage.removeItem('search_history');
                 this.token = null;
                 this.currentUser = null;
                 this.todos = [];
@@ -772,6 +916,9 @@
                 this.stats = null;
                 this.selectedCategoryIds = [];
                 this.editingTodo = null;
+                this.searchQuery = '';
+                this.searchResults = null;
+                this.searchHistory = [];
                 this.currentView = 'auth';
                 this.render();
                 this.showNotification('Выход выполнен', 'info');
@@ -1005,6 +1152,18 @@
                 this.fetchTodos().then(() => this.render());
             }
             
+            renderHighlightedText(text) {
+                if (!text) return '';
+                return text
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;')
+                    .replace(/<mark>/g, '<mark>')
+                    .replace(/<\/mark>/g, '</mark>');
+            }
+            
             renderAuth() {
                 return `
                     <div class="auth-container">
@@ -1061,14 +1220,35 @@
             }
             
             renderMain() {
-                const filteredTodos = this.getFilteredTodos();
+                const filteredTodos = this.searchResults ? this.searchResults.results : this.getFilteredTodos();
                 const hasExpiringTodos = this.expiringTodos && this.expiringTodos.length > 0;
                 const hasSelectedCategories = this.selectedCategoryIds.length > 0;
+                const isSearchMode = this.searchResults !== null;
                 
                 return `
                     <div class="container">
                         <header class="app-header">
                             <h1><i class="fas fa-tasks"></i> Todo App</h1>
+                            
+                            <div class="search-container">
+                                <i class="fas fa-search search-icon"></i>
+                                <input type="text" 
+                                       class="search-box" 
+                                       id="searchBox"
+                                       placeholder="Поиск задач..." 
+                                       value="${this.searchQuery}"
+                                       autocomplete="off">
+                                ${this.isSearching ? `
+                                    <div class="search-results-count">
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                    </div>
+                                ` : isSearchMode && this.searchResults ? `
+                                    <div class="search-results-count">
+                                        ${this.searchResults.count}
+                                    </div>
+                                ` : ''}
+                            </div>
+                            
                             <div class="user-info">
                                 <i class="fas fa-user-circle"></i>
                                 ${this.currentUser.username}
@@ -1077,6 +1257,24 @@
                                 </button>
                             </div>
                         </header>
+                        
+                        ${isSearchMode && this.searchResults ? `
+                            <div class="card" style="margin-bottom: 20px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <h3 style="margin: 0; color: #5a67d8;">
+                                            <i class="fas fa-search"></i> Результаты поиска
+                                        </h3>
+                                        <div style="color: #718096; margin-top: 5px;">
+                                            Найдено задач: <strong>${this.searchResults.count}</strong> по запросу: <strong>"${this.searchResults.query}"</strong>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-info" id="clearSearchBtn">
+                                        <i class="fas fa-times"></i> Очистить поиск
+                                    </button>
+                                </div>
+                            </div>
+                        ` : ''}
                         
                         <div class="main-content">
                             <!-- Левая колонка -->
@@ -1206,8 +1404,16 @@
                             <!-- Правая колонка -->
                             <div class="card">
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                                    <h2><i class="fas fa-list-check"></i> Мои задачи (${filteredTodos.length})</h2>
+                                    <h2>
+                                        ${isSearchMode ? `
+                                            <i class="fas fa-search"></i> Результаты поиска
+                                        ` : `
+                                            <i class="fas fa-list-check"></i> Мои задачи
+                                        `}
+                                        (${filteredTodos.length})
+                                    </h2>
                                     
+                                    ${!isSearchMode ? `
                                     <div class="filters">
                                         <button class="filter-btn ${this.filter === 'all' ? 'active' : ''}" data-filter="all">
                                             <i class="fas fa-list"></i> Все
@@ -1222,9 +1428,11 @@
                                             <i class="fas fa-exclamation-triangle"></i> Просроченные
                                         </button>
                                     </div>
+                                    ` : ''}
                                 </div>
                                 
-                                <!-- Фильтры по категориям -->
+                                <!-- Фильтры по категориям (только не в режиме поиска) -->
+                                ${!isSearchMode ? `
                                 <div style="margin-bottom: 15px;">
                                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                                         <label style="font-weight: 600; color: #495057;">
@@ -1253,93 +1461,117 @@
                                         </div>
                                     ` : ''}
                                 </div>
+                                ` : ''}
                                 
-                                <div class="todos-container" id="todosList">
-                                    ${filteredTodos.length === 0 ? `
-                                        <div class="empty-state">
-                                            <i class="fas fa-clipboard-list"></i>
-                                            <h3>Задачи не найдены</h3>
-                                            <p>${this.filter === 'all' ? 'Создайте свою первую задачу!' : 
-                                                this.filter === 'pending' ? 'Нет активных задач' : 
-                                                this.filter === 'completed' ? 'Нет выполненных задач' :
-                                                'Нет просроченных задач'}</p>
-                                        </div>
-                                    ` : filteredTodos.map(todo => {
-                                        const overdue = this.isOverdue(todo);
-                                        const expiring = this.isExpiring(todo);
-                                        const categoryName = this.getCategoryName(todo.category_id);
-                                        const categoryColor = this.getCategoryColor(todo.category_id);
-                                        
-                                        return `
-                                        <div class="todo-item ${todo.completed ? 'completed' : ''} ${overdue ? 'overdue' : ''} ${expiring ? 'expiring' : ''}" data-id="${todo.id}">
-                                            <div class="todo-header">
-                                                <div class="todo-title">
-                                                    ${todo.completed ? `<s>${todo.title}</s>` : todo.title}
-                                                    ${overdue && !todo.completed && `
-                                                        <span style="margin-left: 10px; font-size: 0.8rem; color: #f56565;">
-                                                            <i class="fas fa-exclamation-triangle"></i> Просрочено
-                                                        </span>
-                                                    `}
-                                                    ${expiring && !todo.completed && !overdue && `
-                                                        <span style="margin-left: 10px; font-size: 0.8rem; color: #f6ad55;">
-                                                            <i class="fas fa-clock"></i> Истекает
-                                                        </span>
-                                                    `}
-                                                </div>
-                                                <div class="todo-actions">
-                                                    <button class="btn btn-sm ${todo.completed ? 'btn-secondary' : 'btn-primary'}" 
-                                                            data-action="toggle" 
-                                                            title="${todo.completed ? 'Возобновить' : 'Завершить'}">
-                                                        <i class="fas fa-${todo.completed ? 'redo' : 'check'}"></i>
-                                                    </button>
-                                                    <button class="btn btn-sm btn-warning" 
-                                                            data-action="edit" 
-                                                            title="Редактировать">
-                                                        <i class="fas fa-edit"></i>
-                                                    </button>
-                                                    <button class="btn btn-sm btn-danger" 
-                                                            data-action="delete" 
-                                                            title="Удалить">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </div>
+                                ${this.isSearching ? `
+                                    <div class="loading">
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                        <p>Идет поиск...</p>
+                                    </div>
+                                ` : `
+                                    <div class="todos-container" id="todosList">
+                                        ${filteredTodos.length === 0 ? `
+                                            <div class="empty-state">
+                                                <i class="fas fa-clipboard-list"></i>
+                                                <h3>${isSearchMode ? 'Ничего не найдено' : 'Задачи не найдены'}</h3>
+                                                <p>${isSearchMode ? 'Попробуйте изменить запрос' : 
+                                                    this.filter === 'all' ? 'Создайте свою первую задачу!' : 
+                                                    this.filter === 'pending' ? 'Нет активных задач' : 
+                                                    this.filter === 'completed' ? 'Нет выполненных задач' :
+                                                    'Нет просроченных задач'}</p>
                                             </div>
+                                        ` : filteredTodos.map(todo => {
+                                            const overdue = this.isOverdue(todo);
+                                            const expiring = this.isExpiring(todo);
+                                            const categoryName = this.getCategoryName(todo.category_id);
+                                            const categoryColor = this.getCategoryColor(todo.category_id);
+                                            const isSearchResult = isSearchMode && (todo.title_snippet || todo.desc_snippet);
                                             
-                                            ${todo.description ? `
-                                                <div style="color: #718096; margin: 8px 0; font-size: 0.95rem;">
-                                                    ${todo.description}
+                                            return `
+                                            <div class="todo-item ${todo.completed ? 'completed' : ''} ${overdue ? 'overdue' : ''} ${expiring ? 'expiring' : ''} ${isSearchResult ? 'highlighted' : ''}" data-id="${todo.id}">
+                                                <div class="todo-header">
+                                                    <div class="todo-title">
+                                                        ${isSearchMode && todo.title_snippet ? 
+                                                            this.renderHighlightedText(todo.title_snippet) : 
+                                                            (todo.completed ? `<s>${todo.title}</s>` : todo.title)}
+                                                        ${(() => {
+                                                        if (overdue && !todo.completed) {
+                                                            return `<span style="margin-left: 10px; font-size: 0.8rem; color: #f56565;">
+                                                                <i class="fas fa-exclamation-triangle"></i> Просрочено
+                                                            </span>`;
+                                                        } else if (expiring && !todo.completed) {
+                                                            return `<span style="margin-left: 10px; font-size: 0.8rem; color: #f6ad55;">
+                                                                <i class="fas fa-clock"></i> Истекает
+                                                            </span>`;
+                                                        }
+                                                        return '';
+                                                    })()}
+                                                    </div>
+                                                    <div class="todo-actions">
+                                                        <button class="btn btn-sm ${todo.completed ? 'btn-secondary' : 'btn-primary'}" 
+                                                                data-action="toggle" 
+                                                                title="${todo.completed ? 'Возобновить' : 'Завершить'}">
+                                                            <i class="fas fa-${todo.completed ? 'redo' : 'check'}"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-warning" 
+                                                                data-action="edit" 
+                                                                title="Редактировать">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-danger" 
+                                                                data-action="delete" 
+                                                                title="Удалить">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                            ` : ''}
-                                            
-                                            <div class="todo-meta">
-                                                <div class="todo-meta-item">
-                                                    <i class="fas fa-flag"></i>
-                                                    <span class="priority-badge ${this.getPriorityClass(todo.priority)}">
-                                                        Приоритет: ${todo.priority}
-                                                    </span>
-                                                </div>
-                                                ${categoryName ? `
-                                                    <div class="todo-meta-item">
-                                                        <i class="fas fa-tag"></i>
-                                                        <span class="category-tag" style="background-color: ${categoryColor}">
-                                                            ${categoryName}
+                                                
+                                                ${(isSearchMode && todo.desc_snippet) || todo.description ? `
+                                                    <div style="color: #718096; margin: 8px 0; font-size: 0.95rem;">
+                                                        ${isSearchMode && todo.desc_snippet ? 
+                                                            this.renderHighlightedText(todo.desc_snippet) : 
+                                                            todo.description}
+                                                    </div>
+                                                ` : ''}
+                                                
+                                                ${isSearchMode && todo.relevance ? `
+                                                    <div style="margin: 5px 0;">
+                                                        <span class="relevance-badge">
+                                                            Релевантность: ${todo.relevance.toFixed(2)}
                                                         </span>
                                                     </div>
                                                 ` : ''}
-                                                <div class="todo-meta-item">
-                                                    <i class="fas fa-calendar-alt"></i>
-                                                    <span>Создано: ${this.formatDate(todo.created_at)}</span>
-                                                </div>
-                                                ${todo.due_date ? `
+                                                
+                                                <div class="todo-meta">
                                                     <div class="todo-meta-item">
-                                                        <i class="fas fa-clock"></i>
-                                                        <span>Срок: ${this.formatDate(todo.due_date)}</span>
+                                                        <i class="fas fa-flag"></i>
+                                                        <span class="priority-badge ${this.getPriorityClass(todo.priority)}">
+                                                            Приоритет: ${todo.priority}
+                                                        </span>
                                                     </div>
-                                                ` : ''}
+                                                    ${categoryName ? `
+                                                        <div class="todo-meta-item">
+                                                            <i class="fas fa-tag"></i>
+                                                            <span class="category-tag" style="background-color: ${categoryColor}">
+                                                                ${categoryName}
+                                                            </span>
+                                                        </div>
+                                                    ` : ''}
+                                                    <div class="todo-meta-item">
+                                                        <i class="fas fa-calendar-alt"></i>
+                                                        <span>Создано: ${this.formatDate(todo.created_at)}</span>
+                                                    </div>
+                                                    ${todo.due_date ? `
+                                                        <div class="todo-meta-item">
+                                                            <i class="fas fa-clock"></i>
+                                                            <span>Срок: ${this.formatDate(todo.due_date)}</span>
+                                                        </div>
+                                                    ` : ''}
+                                                </div>
                                             </div>
-                                        </div>
-                                    `}).join('')}
-                                </div>
+                                        `}).join('')}
+                                    </div>
+                                `}
                             </div>
                         </div>
                     </div>
@@ -1417,7 +1649,21 @@
             }
             
             getFilteredTodos() {
-                return this.todos;
+                let filtered = this.todos;
+                
+                switch (this.filter) {
+                    case 'pending':
+                        filtered = filtered.filter(todo => !todo.completed);
+                        break;
+                    case 'completed':
+                        filtered = filtered.filter(todo => todo.completed);
+                        break;
+                    case 'overdue':
+                        filtered = filtered.filter(todo => this.isOverdue(todo));
+                        break;
+                }
+                
+                return filtered;
             }
             
             render() {
@@ -1489,6 +1735,36 @@
                     this.clearCategoryFilters();
                 });
                 
+                // Очистка поиска
+                document.getElementById('clearSearchBtn')?.addEventListener('click', () => {
+                    this.clearSearch();
+                });
+                
+                // Поиск по Enter
+                document.getElementById('searchBox')?.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const query = e.target.value.trim();
+                        if (query.length >= 2) {
+                            this.performSearch(query);
+                        } else {
+                            this.showNotification('Введите минимум 2 символа для поиска', 'warning');
+                        }
+                    }
+                });
+                
+                // Автофокус на поле поиска
+                setTimeout(() => {
+                    const searchBox = document.getElementById('searchBox');
+                    if (searchBox) {
+                        searchBox.focus();
+                        // Выделяем весь текст если есть поисковый запрос
+                        if (searchBox.value) {
+                            searchBox.select();
+                        }
+                    }
+                }, 100);
+                
                 // Создание задачи
                 document.getElementById('createTodoForm')?.addEventListener('submit', async (e) => {
                     e.preventDefault();
@@ -1545,14 +1821,21 @@
                         await this.toggleTodo(todoId);
                         this.render();
                     } else if (action === 'edit') {
-                        const todo = this.todos.find(t => t.id === todoId);
+                        const todo = this.searchResults ? 
+                            this.searchResults.results.find(t => t.id === todoId) : 
+                            this.todos.find(t => t.id === todoId);
                         if (todo) {
                             this.editingTodo = { ...todo };
                             this.render();
                         }
                     } else if (action === 'delete') {
                         await this.deleteTodo(todoId);
-                        this.render();
+                        if (this.searchResults) {
+                            // Обновляем результаты поиска после удаления
+                            await this.performSearch(this.searchQuery);
+                        } else {
+                            this.render();
+                        }
                     }
                 });
                 
@@ -1594,6 +1877,9 @@
                         const success = await this.updateTodo(updatedTodo);
                         if (success) {
                             this.editingTodo = null;
+                            if (this.searchResults) {
+                                await this.performSearch(this.searchQuery);
+                            }
                             this.render();
                         }
                     });
