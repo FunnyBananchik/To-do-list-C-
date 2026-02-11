@@ -26,6 +26,13 @@ class Database {
             }
             return instance;
         } 
+
+        static void cleanup() {
+            if (instance) {
+                delete instance;
+                instance = nullptr;
+            }
+        }
         
         bool open(const string& path) {
             db_path = path;
@@ -66,6 +73,21 @@ class Database {
                 );
             )";
 
+             // Создание виртуальной таблицы FTS5 для поиска
+            const char* createFtsTable = R"(
+            CREATE VIRTUAL TABLE IF NOT EXISTS todos_fts USING fts5(
+                id UNINDEXED,
+                user_id UNINDEXED,
+                title,
+                description,
+                content='todos',
+                content_rowid='rowid',
+                tokenize = 'unicode61 remove_diacritics 1'
+                );
+            )";
+        
+            createTables(createFtsTable);
+
             int rc = sqlite3_open(path.c_str(), &db);
             if (rc != SQLITE_OK) {
                 cerr << "Cannot open database: " << sqlite3_errmsg(db) << endl;
@@ -76,12 +98,34 @@ class Database {
             createTables(sql_cat);
             createTables(sql_todos);
 
+        // Триггеры для автоматического обновления FTS
+                const char* sql_fts_triggers = R"(
+                        -- Триггер для INSERT
+            CREATE TRIGGER IF NOT EXISTS todos_ai AFTER INSERT ON todos BEGIN
+                INSERT INTO todos_fts(rowid, id, user_id, title, description) 
+                VALUES (new.rowid, new.id, new.user_id, new.title, new.description);
+            END;
+            
+            -- Триггер для UPDATE
+            CREATE TRIGGER IF NOT EXISTS todos_au AFTER UPDATE ON todos BEGIN
+                DELETE FROM todos_fts WHERE rowid = old.rowid;
+                INSERT INTO todos_fts(rowid, id, user_id, title, description) 
+                VALUES (new.rowid, new.id, new.user_id, new.title, new.description);
+            END;
+            
+            -- Триггер для DELETE
+            CREATE TRIGGER IF NOT EXISTS todos_ad AFTER DELETE ON todos BEGIN
+                DELETE FROM todos_fts WHERE rowid = old.rowid;
+            END;
+            )";
+            createTables(sql_fts_triggers);
+            checkAndPopulateFtsTable();
             if (countUsers() == 0) {
                 createDefaultUser();
             }
 
                 return true;
-            }
+        }
 
         void close() {
             if (db) {
@@ -89,6 +133,10 @@ class Database {
                 db = nullptr;
             }
         }
+
+        sqlite3* getRawDb() const {
+        return db;
+    }
 
         void createTables(const char* sql) {
             char* errMsg = nullptr;
@@ -100,6 +148,335 @@ class Database {
              cout << "Tables created/checked" << endl;
             }
         }
+
+        void checkAndPopulateFtsTable() {
+        // Проверяем, существует ли таблица FTS5
+        const char* check_sql = "SELECT name FROM sqlite_master WHERE type='table' AND name='todos_fts'";
+        sqlite3_stmt* stmt;
+        
+        if (sqlite3_prepare_v2(db, check_sql, -1, &stmt, nullptr) != SQLITE_OK) {
+            cerr << "Failed to check FTS table: " << sqlite3_errmsg(db) << endl;
+            return;
+        }
+        
+        bool fts_exists = false;
+        if (sqlite3_step(stmt) == SQLITE_ROW) {
+            fts_exists = true;
+        }
+        sqlite3_finalize(stmt);
+        
+        if (!fts_exists) {
+            cout << "FTS table not found, creating..." << endl;
+            
+            const char* create_fts = R"(
+                CREATE VIRTUAL TABLE todos_fts USING fts5(
+                    id UNINDEXED,
+                    user_id UNINDEXED,
+                    title,
+                    description,
+                    content='todos',
+                    content_rowid='rowid'
+                )
+            )";
+            
+            char* errMsg = nullptr;
+            if (sqlite3_exec(db, create_fts, nullptr, nullptr, &errMsg) != SQLITE_OK) {
+                cerr << "Failed to create FTS table: " << errMsg << endl;
+                sqlite3_free(errMsg);
+                return;
+            }
+            
+            cout << "FTS table created" << endl;
+        }
+        populateFtsTable();
+    }
+
+
+    void populateFtsTable() {
+        
+        const char* clear_sql = "DELETE FROM todos_fts";
+        sqlite3_exec(db, clear_sql, nullptr, nullptr, nullptr);
+        
+        const char* sql = R"(
+            INSERT INTO todos_fts(rowid, id, user_id, title, description)
+            SELECT rowid, id, user_id, title, description FROM todos
+            WHERE rowid NOT IN (SELECT rowid FROM todos_fts)
+        )";
+        
+        char* errMsg = nullptr;
+        int rc = sqlite3_exec(db, sql, nullptr, nullptr, &errMsg);
+        if (rc != SQLITE_OK) {
+            cerr << "Error populating FTS table: " << errMsg << endl;
+            sqlite3_free(errMsg);
+        } else {
+            cout << "FTS table populated with existing data" << endl;
+        }
+    }
+
+        //_______________________________Поиск_________________________________________
+
+        vector<Todo> searchTodos(int user_id, const string& query, bool highlight = false) {
+        vector<Todo> results;
+        
+        if (query.empty()) {
+            return results;
+        }
+        
+        string safe_query = escapeFtsQuery(query);
+        
+        string sql;
+        if (highlight) {
+            // Вариант с подсветкой
+            sql = R"(
+                SELECT 
+                    t.id,
+                    t.title,
+                    t.description,
+                    t.completed,
+                    t.created_at,
+                    t.due_date,
+                    t.priority,
+                    t.category_id,
+                    t.user_id,
+                    snippet(todos_fts, 0, '<mark>', '</mark>', '…', 30) as title_snippet,
+                    snippet(todos_fts, 1, '<mark>', '</mark>', '…', 40) as desc_snippet,
+                    bm25(todos_fts) as relevance
+                FROM todos t
+                JOIN todos_fts ON t.rowid = todos_fts.rowid
+                WHERE t.user_id = ?
+                AND todos_fts MATCH ?
+                ORDER BY relevance DESC, t.created_at DESC
+                LIMIT 50
+            )";
+        } else {
+            // Простой вариант без подсветки
+            sql = R"(
+                SELECT 
+                    t.id,
+                    t.title,
+                    t.description,
+                    t.completed,
+                    t.created_at,
+                    t.due_date,
+                    t.priority,
+                    t.category_id,
+                    t.user_id,
+                    bm25(todos_fts) as relevance
+                FROM todos t
+                JOIN todos_fts ON t.rowid = todos_fts.rowid
+                WHERE t.user_id = ?
+                AND todos_fts MATCH ?
+                ORDER BY relevance DESC, t.created_at DESC
+                LIMIT 50
+            )";
+        }
+        
+        sqlite3_stmt* stmt;
+        if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+            cerr << "Failed to prepare search statement: " << sqlite3_errmsg(db) << endl;
+            return results;
+        }
+        
+        sqlite3_bind_int(stmt, 1, user_id);
+        
+        string fts_query;
+        if (safe_query.find(' ') != string::npos && safe_query.find('"') == string::npos) {
+        
+            fts_query = "\"" + safe_query + "\"";
+        } else {
+            fts_query = safe_query;
+        }
+        
+        // Добавляем префиксный поиск для последнего слова
+        if (!fts_query.empty()) {
+            size_t last_space = fts_query.find_last_of(' ');
+            if (last_space != string::npos) {
+                string last_word = fts_query.substr(last_space + 1);
+                if (!last_word.empty() && last_word.back() != '*' && last_word.back() != '"') {
+                    fts_query = fts_query.substr(0, last_space + 1) + last_word + "*";
+                }
+            } else if (fts_query.back() != '*' && fts_query.back() != '"') {
+                fts_query += "*";
+            }
+        }
+        
+        sqlite3_bind_text(stmt, 2, fts_query.c_str(), -1, SQLITE_TRANSIENT);
+        
+        while (sqlite3_step(stmt) == SQLITE_ROW) {
+            Todo todo;
+            todo.id = sqlite3_column_int(stmt, 0);
+            
+            const char* title = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
+            todo.title = title ? title : "";
+            
+            const char* description = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
+            todo.description = description ? description : "";
+            
+            todo.completed = sqlite3_column_int(stmt, 3) == 1;
+            
+            const char* created_at = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 4));
+            todo.created_at = created_at ? created_at : "";
+            
+            const char* due_date = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 5));
+            todo.due_date = due_date ? due_date : "";
+            
+            todo.priority = sqlite3_column_int(stmt, 6);
+            todo.category_id = sqlite3_column_int(stmt, 7);
+            todo.user_id = sqlite3_column_int(stmt, 8);
+            
+            // Подсвеченные фрагменты
+            if (highlight) {
+                const char* title_snippet = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 9));
+                const char* desc_snippet = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 10));
+                
+                if (title_snippet) {
+                    todo.title_snippet = title_snippet;
+                }
+                if (desc_snippet) {
+                    todo.desc_snippet = desc_snippet;
+                }
+                
+                todo.relevance = sqlite3_column_double(stmt, 11);
+            } else if (sqlite3_column_count(stmt) > 9) {
+                todo.relevance = sqlite3_column_double(stmt, 9);
+            }
+            
+            results.push_back(todo);
+        }
+        
+        sqlite3_finalize(stmt);
+        
+        if (results.empty()) {
+            return searchTodosFallback(user_id, query);
+        }
+        
+        return results;
+}
+
+
+    vector<Todo> searchTodosFallback(int user_id, const string& query) {
+        vector<Todo> results;
+        
+        string sql = R"(
+            SELECT 
+                id, title, description, completed, created_at, 
+                due_date, priority, category_id, user_id
+            FROM todos 
+            WHERE user_id = ?
+            AND (
+                title LIKE ? 
+                OR description LIKE ?
+                OR title LIKE ? 
+                OR description LIKE ?
+            )
+            ORDER BY created_at DESC
+            LIMIT 50
+        )";
+        
+        sqlite3_stmt* stmt;
+        if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+            cerr << "Failed to prepare fallback search statement: " << sqlite3_errmsg(db) << endl;
+            return results;
+        }
+        
+        // Пробуем разные варианты поиска
+        string pattern1 = "%" + query + "%";
+        string pattern2 = query + "%";  // Начинается с запроса
+        
+        sqlite3_bind_int(stmt, 1, user_id);
+        sqlite3_bind_text(stmt, 2, pattern1.c_str(), -1, SQLITE_TRANSIENT);
+        sqlite3_bind_text(stmt, 3, pattern1.c_str(), -1, SQLITE_TRANSIENT);
+        sqlite3_bind_text(stmt, 4, pattern2.c_str(), -1, SQLITE_TRANSIENT);
+        sqlite3_bind_text(stmt, 5, pattern2.c_str(), -1, SQLITE_TRANSIENT);
+        
+        while (sqlite3_step(stmt) == SQLITE_ROW) {
+            Todo todo;
+            todo.id = sqlite3_column_int(stmt, 0);
+            
+            const char* title = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
+            todo.title = title ? title : "";
+            
+            const char* description = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
+            todo.description = description ? description : "";
+            
+            todo.completed = sqlite3_column_int(stmt, 3) == 1;
+            
+            const char* created_at = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 4));
+            todo.created_at = created_at ? created_at : "";
+            
+            const char* due_date = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 5));
+            todo.due_date = due_date ? due_date : "";
+            
+            todo.priority = sqlite3_column_int(stmt, 6);
+            todo.category_id = sqlite3_column_int(stmt, 7);
+            todo.user_id = sqlite3_column_int(stmt, 8);
+            
+            string lower_query = query;
+            string lower_title = todo.title;
+            string lower_desc = todo.description;
+            
+            transform(lower_query.begin(), lower_query.end(), lower_query.begin(), ::tolower);
+            transform(lower_title.begin(), lower_title.end(), lower_title.begin(), ::tolower);
+            transform(lower_desc.begin(), lower_desc.end(), lower_desc.begin(), ::tolower);
+            
+            // Простой расчет релевантности
+            double relevance = 0.0;
+            if (lower_title.find(lower_query) != string::npos) {
+                relevance += 2.0;
+                if (lower_title.find(lower_query) == 0) {
+                    relevance += 1.0; 
+                }
+            }
+            if (lower_desc.find(lower_query) != string::npos) {
+                relevance += 1.0;
+            }
+            
+            todo.relevance = relevance;
+            
+            results.push_back(todo);
+        }
+        
+        sqlite3_finalize(stmt);
+        
+        // Сортируем по релевантности
+        sort(results.begin(), results.end(), [](const Todo& a, const Todo& b) {
+            return a.relevance > b.relevance;
+        });
+        
+        return results;
+    }
+
+
+    string escapeFtsQuery(const string& query) {
+        if (query.empty()) return "";
+        
+        string escaped;
+        escaped.reserve(query.length());
+        
+        // FTS5 спецсимволы, которые нужно экранировать
+        const string special_chars = "\"'\\*^~-:";
+        
+        for (char c : query) {
+            if (special_chars.find(c) != string::npos) {
+                escaped += '\\';
+            }
+            escaped += c;
+        }
+        
+        /*if (escaped.find('"') != string::npos || 
+            escaped.find(" AND ") != string::npos ||
+            escaped.find(" OR ") != string::npos ||
+            escaped.find(" NOT ") != string::npos) {
+            return escaped;
+        }
+            */
+        
+        if (escaped.find(' ') != string::npos) {
+            escaped = "\"" + escaped + "\"";
+        }
+        
+        return escaped;
+    }
 
         //_______________________________Todo__________________________________________
 
@@ -666,7 +1043,7 @@ class Database {
         
         if (!userExists(username)) {
             registerUser(username, password);
-            cout << "👤 Created default user: " << username << "/" << password << endl;
+            cout << "Created default user: " << username << "/" << password << endl;
         }
     }
     

@@ -20,6 +20,25 @@ using namespace std;
 Database* db = nullptr;
 
 
+// Вспомогательная функция для экранирования JSON
+    string escape_json(const string& s) {
+        string result;
+        for (char c : s) {
+            switch (c) {
+                case '"':  result += "\\\""; break;
+                case '\\': result += "\\\\"; break;
+                case '\b': result += "\\b"; break;
+                case '\f': result += "\\f"; break;
+                case '\n': result += "\\n"; break;
+                case '\r': result += "\\r"; break;
+                case '\t': result += "\\t"; break;
+                default:   result += c; break;
+            }
+        }
+        return result;
+    }
+
+
 bool file_exists(const string& filename) {
     struct stat buffer;
     return (stat(filename.c_str(), &buffer) == 0);
@@ -73,7 +92,7 @@ string read_html_file(const string& filename) {
             if (file.is_open()) {
                 stringstream buffer;
                 buffer << file.rdbuf();
-                cout << "✅ Loaded frontend from: " << path << endl;
+                cout << "Loaded frontend from: " << path << endl;
                 return buffer.str();
             }
         }
@@ -486,7 +505,7 @@ int main() {
         updatedTodo.id = id; 
         updatedTodo.user_id = user_id;
         // Логируем 
-        cout << "🔍 Парсинг JSON:" << endl;
+        cout << "Парсинг JSON:" << endl;
             cout << "   ID: " << updatedTodo.id << endl;
             cout << "   Title: " << updatedTodo.title << endl;
             cout << "   Description: " << updatedTodo.description << endl;
@@ -695,12 +714,69 @@ int main() {
     });
 });
 
-    
+        server.Get("/api/todos/search", [](const httplib::Request& req, httplib::Response& res) {
+            protected_endpoint(req, res, db,
+            [](const httplib::Request& req, httplib::Response& res, Database* db, int user_id, string username) {
+            
+            string query = req.get_param_value("q");
+            string highlight_param = req.get_param_value("highlight");
+            bool highlight = (highlight_param == "true" || highlight_param == "1");
+            
+            if (query.empty()) {
+                res.status = 400;
+                res.set_content("{\"error\":\"Search query is required\",\"code\":400}", "application/json");
+                return;
+            }
+            
+            cout << "Search request from user '" << username 
+                << "': \"" << query << "\"" << endl;
+            
+            const char* check_sql = "SELECT name FROM sqlite_master WHERE type='table' AND name='todos_fts'";
+            sqlite3_stmt* check_stmt;
+            bool fts_table_exists = false;
+            
+            if (sqlite3_prepare_v2(db->getRawDb(), check_sql, -1, &check_stmt, nullptr) == SQLITE_OK) {
+                if (sqlite3_step(check_stmt) == SQLITE_ROW) {
+                    fts_table_exists = true;
+                }
+                sqlite3_finalize(check_stmt);
+            }
+            
+            if (!fts_table_exists) {
+               
+                cerr << "FTS table not found, using LIKE fallback" << endl;
+                res.set_content("{\"error\":\"Full-text search is not available yet\",\"code\":501}", "application/json");
+                return;
+            }
+            
+            // Вызываем метод поиска
+            auto results = db->searchTodos(user_id, query, highlight);
+            
+            stringstream json;
+            json << "{";
+            json << "\"query\":\"" << escape_json(query) << "\",";
+            json << "\"count\":" << results.size() << ",";
+            json << "\"results\":[";
+            
+            for (size_t i = 0; i < results.size(); ++i) {
+                json << results[i].to_json();
+                if (i != results.size() - 1) json << ",";
+            }
+            
+            json << "]";
+            json << "}";
+            
+            res.set_content(json.str(), "application/json");
+            cout << "Search completed, found " << results.size() << " results" << endl;
+        });
+    });
+
+ 
     cout << "Server running on http://localhost:8080" << endl << endl;
     cout << "Press Ctrl+C to stop" << endl;
     cout << "======================================" << endl;
     
     server.listen("0.0.0.0", 8080);
-    
+    Database::cleanup();
     return 0;
 }

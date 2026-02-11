@@ -17,6 +17,10 @@ struct Todo {
     string due_date;
     int category_id;
     int user_id;
+
+    string title_snippet;  // Подсвеченный заголовок
+    string desc_snippet;   // Подсвеченное описание
+    double relevance;      // Релевантность поиска
     
     // Конструктор для создания новой задачи (без ID)
     Todo(string t, string d = "", int k = 1, string du = "", int cat_id = 0, int uid = 0) 
@@ -75,6 +79,15 @@ struct Todo {
         json << "\"due_date\":\"" << due_date << "\",";
         json << "\"category_id\":" << category_id << ",";
         json << "\"user_id\":" << user_id;
+        if (!title_snippet.empty()) {
+            json << ",\"title_snippet\":\"" << escape_json(title_snippet) << "\"";
+        }
+        if (!desc_snippet.empty()) {
+            json << ",\"desc_snippet\":\"" << escape_json(desc_snippet) << "\"";
+        }
+        if (relevance > 0) {
+            json << ",\"relevance\":" << relevance;
+        }
         json << "}";
         return json.str();
     } 
