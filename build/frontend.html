@@ -469,6 +469,36 @@
             background: #cbd5e0;
         }
         
+        .search-examples {
+            margin-top: 15px;
+            padding: 10px;
+            background: #e6f7ff;
+            border-left: 4px solid #5a67d8;
+            border-radius: 4px;
+        }
+        
+        .search-example-item {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .search-example-query {
+            background: #5a67d8;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-family: monospace;
+        }
+        
+        .search-example-desc {
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+        
         .search-results-header {
             display: flex;
             justify-content: space-between;
@@ -775,6 +805,32 @@
         .clear-filters-btn:hover {
             background: #cbd5e0;
         }
+        
+        .debug-panel {
+            background: #1a202c;
+            color: #a0aec0;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .debug-panel.visible {
+            display: block;
+        }
+        
+        .debug-toggle {
+            color: #718096;
+            font-size: 0.8rem;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        
+        .debug-toggle:hover {
+            color: #5a67d8;
+        }
     </style>
 </head>
 <body>
@@ -800,6 +856,7 @@
                 this.searchResults = null;
                 this.isSearching = false;
                 this.searchHistory = JSON.parse(localStorage.getItem('search_history') || '[]');
+                this.debugMode = false;
                 this.init();
             }
             
@@ -934,6 +991,7 @@
                 }
             }
             
+            // ИСПРАВЛЕННАЯ ФУНКЦИЯ ПОИСКА
             async searchTodos(query) {
                 if (!query || query.trim().length < 2) {
                     this.searchResults = null;
@@ -948,19 +1006,52 @@
                 this.render();
                 
                 try {
-                    // 1. Сохраняем исходный запрос для отображения
+                    // Сохраняем оригинальный запрос
                     let ftsQuery = query;
                     
-                    // 2. Преобразуем русские операторы в английские (ТОЛЬКО если они отделены пробелами)
-                    ftsQuery = ftsQuery
-                        .replace(/\s+И\s+/g, ' AND ')
-                        .replace(/\s+и\s+/g, ' AND ')
-                        .replace(/\s+ИЛИ\s+/g, ' OR ')
-                        .replace(/\s+или\s+/g, ' OR ')
-                        .replace(/\s+НЕ\s+/g, ' NOT ')
-                        .replace(/\s+не\s+/g, ' NOT ');
+                    // Сохраняем фразы в кавычках
+                    let preservedQuotes = [];
+                    let quoteCounter = 0;
+                    ftsQuery = ftsQuery.replace(/"([^"]*)"/g, function(match) {
+                        let placeholder = `__QUOTE_${quoteCounter}__`;
+                        preservedQuotes[quoteCounter] = match;
+                        quoteCounter++;
+                        return placeholder;
+                    });
                     
-                    console.log('Search query to server:', ftsQuery); // ДЛЯ ОТЛАДКИ
+                    // Разбиваем на слова и обрабатываем операторы
+                    let words = ftsQuery.split(/\s+/);
+                    let processedWords = [];
+                    
+                    for (let i = 0; i < words.length; i++) {
+                        let word = words[i];
+                        
+                        // Пропускаем пустые слова
+                        if (!word.trim()) continue;
+                        
+                        // Проверяем операторы (в любом регистре)
+                        let upperWord = word.toUpperCase();
+                        if (upperWord === 'И' || upperWord === 'AND') {
+                            processedWords.push('AND');
+                        } else if (upperWord === 'ИЛИ' || upperWord === 'OR') {
+                            processedWords.push('OR');
+                        } else if (upperWord === 'НЕ' || upperWord === 'NOT') {
+                            processedWords.push('NOT');
+                        } else {
+                            processedWords.push(word);
+                        }
+                    }
+                    
+                    ftsQuery = processedWords.join(' ');
+                    
+                    // Восстанавливаем фразы в кавычках
+                    for (let i = 0; i < preservedQuotes.length; i++) {
+                        ftsQuery = ftsQuery.replace(`__QUOTE_${i}__`, preservedQuotes[i]);
+                    }
+                    
+                    // Логируем для отладки
+                    console.log('🔍 Оригинальный запрос:', query);
+                    console.log('🔍 FTS запрос:', ftsQuery);
                     
                     const response = await fetch(`${this.baseUrl}/api/todos/search?q=${encodeURIComponent(ftsQuery)}&highlight=true`, {
                         headers: {
@@ -972,17 +1063,19 @@
                         const data = await response.json();
                         this.searchResults = {
                             query: query, // показываем исходный запрос
+                            ftsQuery: ftsQuery, // сохраняем для отладки
                             count: data.count,
                             results: data.results
                         };
                         
                         this.addToSearchHistory(query);
+                        console.log(`✅ Найдено результатов: ${data.count}`);
                     } else {
                         const error = await response.json();
                         throw new Error(error.error || 'Ошибка поиска');
                     }
                 } catch (error) {
-                    console.error('Ошибка поиска:', error);
+                    console.error('❌ Ошибка поиска:', error);
                     this.showNotification(error.message || 'Ошибка поиска', 'error');
                     this.searchResults = null;
                 }
@@ -1190,13 +1283,9 @@
                     });
                     
                     if (response.ok) {
-                        // Удаляем категорию из списка
                         this.categories = this.categories.filter(c => c.id !== id);
-                        
-                        // Удаляем категорию из выбранных фильтров
                         this.selectedCategoryIds = this.selectedCategoryIds.filter(catId => catId !== id);
                         
-                        // Обновляем задачи - убираем категорию из всех задач
                         this.todos = this.todos.map(todo => {
                             if (todo.category_id === id) {
                                 todo.category_id = 0;
@@ -1204,7 +1293,6 @@
                             return todo;
                         });
                         
-                        // Обновляем истекающие задачи
                         this.expiringTodos = this.expiringTodos.map(todo => {
                             if (todo.category_id === id) {
                                 todo.category_id = 0;
@@ -1212,7 +1300,6 @@
                             return todo;
                         });
                         
-                        // Если есть результаты поиска, обновляем и их
                         if (this.searchResults) {
                             this.searchResults.results = this.searchResults.results.map(todo => {
                                 if (todo.category_id === id) {
@@ -1304,6 +1391,11 @@
                         notification.remove();
                     }
                 }, 3000);
+            }
+            
+            toggleDebug() {
+                this.debugMode = !this.debugMode;
+                this.render();
             }
             
             isOverdue(todo) {
@@ -1488,11 +1580,23 @@
                             <div class="user-info">
                                 <i class="fas fa-user-circle"></i>
                                 ${this.currentUser?.username || 'Пользователь'}
+                                <span class="debug-toggle" onclick="window.todoApp.toggleDebug()">
+                                    <i class="fas fa-bug"></i>
+                                </span>
                                 <button class="btn btn-sm btn-danger" id="logoutBtn">
                                     <i class="fas fa-sign-out-alt"></i> Выход
                                 </button>
                             </div>
                         </header>
+                        
+                        ${this.debugMode && isSearchMode && this.searchResults.ftsQuery ? `
+                            <div class="debug-panel visible">
+                                <strong>🔍 Отладка поиска:</strong><br>
+                                Оригинальный запрос: <code>${this.searchResults.query}</code><br>
+                                FTS запрос: <code>${this.searchResults.ftsQuery}</code><br>
+                                Результатов: ${this.searchResults.count}
+                            </div>
+                        ` : ''}
                         
                         <div class="main-content">
                             <!-- Левая колонка -->
@@ -1547,30 +1651,61 @@
                                 
                                 <!-- Поиск и помощь -->
                                 <div class="card">
-                                    <h2><i class="fas fa-search"></i> Поиск</h2>
+                                    <h2><i class="fas fa-search"></i> Расширенный поиск</h2>
                                     
                                     <div class="search-help">
-                                        <h4>Как искать:</h4>
+                                        <h4>📝 Как использовать операторы:</h4>
                                         <ul>
-                                            <li><i class="fas fa-check" style="color: #48bb78;"></i> Простой текст: <code>покупки</code></li>
-                                            <li><i class="fas fa-check" style="color: #48bb78;"></i> Фразы: <code>"покупки молока"</code></li>
-                                            <li><i class="fas fa-check" style="color: #48bb78;"></i> Логические операторы: <code>покупки AND молоко</code></li>
-                                            <li><i class="fas fa-check" style="color: #48bb78;"></i> Исключение: <code>покупки NOT работа</code></li>
-                                            <li><i class="fas fa-check" style="color: #48bb78;"></i> Или: <code>покупки OR работа</code></li>
+                                            <li><i class="fas fa-check-circle" style="color: #48bb78;"></i> <strong>AND / И</strong> - оба слова должны присутствовать</li>
+                                            <li><i class="fas fa-check-circle" style="color: #48bb78;"></i> <strong>OR / ИЛИ</strong> - хотя бы одно слово</li>
+                                            <li><i class="fas fa-check-circle" style="color: #48bb78;"></i> <strong>NOT / НЕ</strong> - исключить слово</li>
+                                            <li><i class="fas fa-check-circle" style="color: #48bb78;"></i> <strong>"фраза в кавычках"</strong> - точное совпадение</li>
+                                            <li><i class="fas fa-check-circle" style="color: #48bb78;"></i> <strong>слово*</strong> - префиксный поиск</li>
                                         </ul>
                                         
+                                        <div class="search-examples">
+                                            <h4>🎯 Примеры запросов:</h4>
+                                            <div class="search-example-item">
+                                                <span class="search-example-query">купить AND молоко</span>
+                                                <span class="search-example-desc">найдет задачи, где есть оба слова</span>
+                                            </div>
+                                            <div class="search-example-item">
+                                                <span class="search-example-query">купить OR работа</span>
+                                                <span class="search-example-desc">найдет задачи с любым из слов</span>
+                                            </div>
+                                            <div class="search-example-item">
+                                                <span class="search-example-query">купить NOT молоко</span>
+                                                <span class="search-example-desc">исключит задачи со словом "молоко"</span>
+                                            </div>
+                                            <div class="search-example-item">
+                                                <span class="search-example-query">"купить молоко"</span>
+                                                <span class="search-example-desc">точная фраза</span>
+                                            </div>
+                                            <div class="search-example-item">
+                                                <span class="search-example-query">куп*</span>
+                                                <span class="search-example-desc">слова, начинающиеся с "куп"</span>
+                                            </div>
+                                            <div class="search-example-item">
+                                                <span class="search-example-query">купить AND молоко NOT хлеб</span>
+                                                <span class="search-example-desc">комбинация операторов</span>
+                                            </div>
+                                        </div>
+                                        
                                         <div class="search-operators">
-                                            <button class="operator-btn" data-operator='"покупки молока"'>
+                                            <button class="operator-btn" data-operator='"купить молоко"'>
                                                 <i class="fas fa-quote-left"></i> Фраза
                                             </button>
-                                            <button class="operator-btn" data-operator="покупки AND молоко">
-                                                AND
+                                            <button class="operator-btn" data-operator="купить AND молоко">
+                                                AND / И
                                             </button>
-                                            <button class="operator-btn" data-operator="покупки OR работа">
-                                                OR
+                                            <button class="operator-btn" data-operator="купить OR работа">
+                                                OR / ИЛИ
                                             </button>
-                                            <button class="operator-btn" data-operator="покупки NOT работа">
-                                                NOT
+                                            <button class="operator-btn" data-operator="купить NOT молоко">
+                                                NOT / НЕ
+                                            </button>
+                                            <button class="operator-btn" data-operator="куп*">
+                                                <i class="fas fa-asterisk"></i> Префикс
                                             </button>
                                         </div>
                                     </div>
@@ -1581,7 +1716,7 @@
                                             <div class="search-operators">
                                                 ${this.searchHistory.map(query => `
                                                     <button class="operator-btn" data-history="${query.replace(/"/g, '&quot;')}">
-                                                        ${query.length > 15 ? query.substring(0, 15) + '...' : query}
+                                                        ${query.length > 20 ? query.substring(0, 20) + '...' : query}
                                                     </button>
                                                 `).join('')}
                                             </div>
@@ -1676,9 +1811,10 @@
                                         </h2>
                                         ${isSearchMode ? `
                                             <div class="search-info">
-                                                <span>Найдено: <strong>${this.searchResults?.count || 0}</strong> задач по запросу: <strong>"${this.searchResults?.query || ''}"</strong></span>
+                                                <span>Найдено: <strong>${this.searchResults?.count || 0}</strong> задач</span>
+                                                <span style="color: #718096;">по запросу: <strong>"${this.searchResults?.query || ''}"</strong></span>
                                                 <button class="btn btn-sm btn-info" id="clearSearchBtn">
-                                                    <i class="fas fa-times"></i> Очистить поиск
+                                                    <i class="fas fa-times"></i> Очистить
                                                 </button>
                                             </div>
                                         ` : `
@@ -1783,7 +1919,7 @@
                                                     <div class="todo-title">
                                                         ${isSearchMode && todo.title_snippet ? 
                                                             this.renderHighlightedText(todo.title_snippet) : 
-                                                            (todo.completed ? `<s>${todo.title || 'Без названия'}</s>` : (todo.title || 'Без названия'))}
+                                                            (todo.completed ? `<s>${this.escapeHtml(todo.title || 'Без названия')}</s>` : this.escapeHtml(todo.title || 'Без названия'))}
                                                         ${statusBadge}
                                                     </div>
                                                     <div class="todo-actions">
@@ -1809,7 +1945,7 @@
                                                     <div style="color: #718096; margin: 8px 0; font-size: 0.95rem;">
                                                         ${isSearchMode && todo.desc_snippet ? 
                                                             this.renderHighlightedText(todo.desc_snippet) : 
-                                                            (todo.description || '')}
+                                                            this.escapeHtml(todo.description || '')}
                                                     </div>
                                                 ` : ''}
                                                 
@@ -1824,7 +1960,7 @@
                                                         <div class="todo-meta-item">
                                                             <i class="fas fa-tag"></i>
                                                             <span class="category-tag" style="background-color: ${categoryColor}">
-                                                                ${categoryName}
+                                                                ${this.escapeHtml(categoryName)}
                                                             </span>
                                                         </div>
                                                     ` : ''}
@@ -1861,12 +1997,12 @@
                             <form id="editTodoForm">
                                 <div class="form-group">
                                     <label>Заголовок *</label>
-                                    <input type="text" class="form-input" id="editTodoTitle" value="${(this.editingTodo.title || '').replace(/"/g, '&quot;')}" required>
+                                    <input type="text" class="form-input" id="editTodoTitle" value="${this.escapeHtml(this.editingTodo.title || '')}" required>
                                 </div>
                                 
                                 <div class="form-group">
                                     <label>Описание</label>
-                                    <textarea class="form-textarea" id="editTodoDescription" rows="3">${(this.editingTodo.description || '').replace(/"/g, '&quot;')}</textarea>
+                                    <textarea class="form-textarea" id="editTodoDescription" rows="3">${this.escapeHtml(this.editingTodo.description || '')}</textarea>
                                 </div>
                                 
                                 <div class="form-row">
@@ -1892,7 +2028,7 @@
                                     <select class="form-select" id="editTodoCategory">
                                         <option value="0">Без категории</option>
                                         ${this.categories.map(cat => `
-                                            <option value="${cat.id}" ${this.editingTodo.category_id == cat.id ? 'selected' : ''}>${cat.name}</option>
+                                            <option value="${cat.id}" ${this.editingTodo.category_id == cat.id ? 'selected' : ''}>${this.escapeHtml(cat.name)}</option>
                                         `).join('')}
                                     </select>
                                 </div>
@@ -1919,15 +2055,20 @@
                 `;
             }
             
-            renderHighlightedText(text) {
+            escapeHtml(text) {
                 if (!text) return '';
-                
-                let escaped = text
+                return String(text)
                     .replace(/&/g, '&amp;')
                     .replace(/</g, '&lt;')
                     .replace(/>/g, '&gt;')
                     .replace(/"/g, '&quot;')
                     .replace(/'/g, '&#039;');
+            }
+            
+            renderHighlightedText(text) {
+                if (!text) return '';
+                
+                let escaped = this.escapeHtml(text);
                 
                 escaped = escaped
                     .replace(/&lt;mark&gt;/g, '<mark>')

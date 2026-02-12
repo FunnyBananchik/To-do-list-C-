@@ -82,7 +82,8 @@ class Database {
                 description,
                 content='todos',
                 content_rowid='rowid',
-                tokenize = 'unicode61 remove_diacritics 1'
+                tokenize='unicode61 remove_diacritics 1 categories ''L* N* Co Ps Pe Pf Pd Pc Po Sc Sm Sk So Zl Zp Zs Cc Cf''',
+                prefix='2,3'
                 );
             )";
         
@@ -99,7 +100,7 @@ class Database {
             createTables(sql_todos);
 
         // Триггеры для автоматического обновления FTS
-                const char* sql_fts_triggers = R"(
+            const char* sql_fts_triggers = R"(
                         -- Триггер для INSERT
             CREATE TRIGGER IF NOT EXISTS todos_ai AFTER INSERT ON todos BEGIN
                 INSERT INTO todos_fts(rowid, id, user_id, title, description) 
@@ -176,6 +177,7 @@ class Database {
                     description,
                     content='todos',
                     content_rowid='rowid'
+
                 )
             )";
             
@@ -215,7 +217,7 @@ class Database {
 
         //_______________________________Поиск_________________________________________
 
-        vector<Todo> searchTodos(int user_id, const string& query, bool highlight = false) {
+    vector<Todo> searchTodos(int user_id, const string& query, bool highlight = false) {
         vector<Todo> results;
         
         if (query.empty()) {
@@ -223,10 +225,10 @@ class Database {
         }
         
         string safe_query = escapeFtsQuery(query);
+        string fts_query = safe_query;
         
         string sql;
         if (highlight) {
-            // Вариант с подсветкой
             sql = R"(
                 SELECT 
                     t.id,
@@ -249,7 +251,6 @@ class Database {
                 LIMIT 50
             )";
         } else {
-            // Простой вариант без подсветки
             sql = R"(
                 SELECT 
                     t.id,
@@ -279,26 +280,7 @@ class Database {
         
         sqlite3_bind_int(stmt, 1, user_id);
         
-        string fts_query;
-        if (safe_query.find(' ') != string::npos && safe_query.find('"') == string::npos) {
-        
-            fts_query = "\"" + safe_query + "\"";
-        } else {
-            fts_query = safe_query;
-        }
-        
-        // Добавляем префиксный поиск для последнего слова
-        if (!fts_query.empty()) {
-            size_t last_space = fts_query.find_last_of(' ');
-            if (last_space != string::npos) {
-                string last_word = fts_query.substr(last_space + 1);
-                if (!last_word.empty() && last_word.back() != '*' && last_word.back() != '"') {
-                    fts_query = fts_query.substr(0, last_space + 1) + last_word + "*";
-                }
-            } else if (fts_query.back() != '*' && fts_query.back() != '"') {
-                fts_query += "*";
-            }
-        }
+        cout << "FTS query: '" << fts_query << "'" << endl;
         
         sqlite3_bind_text(stmt, 2, fts_query.c_str(), -1, SQLITE_TRANSIENT);
         
@@ -324,7 +306,6 @@ class Database {
             todo.category_id = sqlite3_column_int(stmt, 7);
             todo.user_id = sqlite3_column_int(stmt, 8);
             
-            // Подсвеченные фрагменты
             if (highlight) {
                 const char* title_snippet = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 9));
                 const char* desc_snippet = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 10));
@@ -347,11 +328,12 @@ class Database {
         sqlite3_finalize(stmt);
         
         if (results.empty()) {
+            cout << "FTS returned no results, using LIKE fallback" << endl;
             return searchTodosFallback(user_id, query);
         }
         
         return results;
-}
+    }
 
 
     vector<Todo> searchTodosFallback(int user_id, const string& query) {
@@ -463,18 +445,20 @@ class Database {
             escaped += c;
         }
         
-        /*if (escaped.find('"') != string::npos || 
-            escaped.find(" AND ") != string::npos ||
-            escaped.find(" OR ") != string::npos ||
-            escaped.find(" NOT ") != string::npos) {
-            return escaped;
-        }
-            */
+        bool has_operators = 
+        escaped.find(" AND ") != string::npos ||
+        escaped.find(" OR ") != string::npos ||
+        escaped.find(" NOT ") != string::npos;
+    
+        bool is_phrase = escaped.length() >= 2 && 
+                        escaped.front() == '"' && 
+                        escaped.back() == '"';
         
-        if (escaped.find(' ') != string::npos) {
+        bool has_prefix = escaped.find('*') != string::npos;
+
+        if (!has_operators && !is_phrase && escaped.find(' ') != string::npos) {
             escaped = "\"" + escaped + "\"";
         }
-        
         return escaped;
     }
 
