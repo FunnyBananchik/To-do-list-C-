@@ -1,3 +1,7 @@
+#include "Logger.h" 
+
+Logger app_logger("logs/todo_server.log", DEBUG);
+
 #include "../httplib.h"
 #include <iostream>
 #include <string>
@@ -6,7 +10,7 @@
 #include <ctime>
 #include <fstream>
 #include <sys/stat.h>  
-#include <unistd.h>     
+#include <unistd.h>    
 #include "Todo.h"
 #include "Database.h"
 #include "Categories.h"
@@ -19,24 +23,23 @@ using namespace std;
 
 Database* db = nullptr;
 
-
 // Вспомогательная функция для экранирования JSON
-    string escape_json(const string& s) {
-        string result;
-        for (char c : s) {
-            switch (c) {
-                case '"':  result += "\\\""; break;
-                case '\\': result += "\\\\"; break;
-                case '\b': result += "\\b"; break;
-                case '\f': result += "\\f"; break;
-                case '\n': result += "\\n"; break;
-                case '\r': result += "\\r"; break;
-                case '\t': result += "\\t"; break;
-                default:   result += c; break;
-            }
+string escape_json(const string& s) {
+    string result;
+    for (char c : s) {
+        switch (c) {
+            case '"':  result += "\\\""; break;
+            case '\\': result += "\\\\"; break;
+            case '\b': result += "\\b"; break;
+            case '\f': result += "\\f"; break;
+            case '\n': result += "\\n"; break;
+            case '\r': result += "\\r"; break;
+            case '\t': result += "\\t"; break;
+            default:   result += c; break;
         }
-        return result;
     }
+    return result;
+}
 
 
 bool file_exists(const string& filename) {
@@ -78,26 +81,25 @@ string cat_to_json(vector<categories>& cat) {
 
 
 string read_html_file(const string& filename) {
-   
     vector<string> possible_paths = {
         filename,                           
         "src/" + filename,                  
         "../src/" + filename,               
         "../../src/" + filename             
-    };
-    
+    };  
     for (const auto& path : possible_paths) {
         if (file_exists(path)) {
             ifstream file(path);
             if (file.is_open()) {
                 stringstream buffer;
                 buffer << file.rdbuf();
-                cout << "Loaded frontend from: " << path << endl;
+                stringstream ss;
+                ss << "Loaded frontend from: " << path;
+                app_logger.info(ss.str());
                 return buffer.str();
             }
         }
-    }
-    
+    }  
     // error HTML
     string error_html = R"(
     <!DOCTYPE html>
@@ -118,10 +120,10 @@ string read_html_file(const string& filename) {
     </body>
     </html>
     )";
-    
-    cerr << " Could not load " << filename << ". Tried paths:" << endl;
     for (const auto& path : possible_paths) {
-        cerr << "   - " << path << endl;
+        stringstream ss;
+        ss << "Could not load " << filename << ". Tried paths: " << path;
+        app_logger.error(ss.str());
     }
     
     return error_html;
@@ -197,11 +199,10 @@ int main() {
     
     db = Database::getInstance();
     
-
     string db_path = "todo_app.db";  
     
     if (!db->open(db_path)) {
-        cerr << "Failed to open database! Exiting..." << endl;
+        app_logger.error("Failed to open database!");
         return 1;
     }
     
@@ -257,8 +258,7 @@ int main() {
 
     // 3. Регистрация
     server.Post("/api/register", [](const httplib::Request& req, httplib::Response& res) {
-        cout << "Registration request" << endl;
-        
+        app_logger.debug("Registration request");
         auto params = parse_simple_json(req.body);
         string username = params["username"];
         string password = params["password"];
@@ -282,17 +282,14 @@ int main() {
         }
         
         User new_user = db->registerUser(username, password);
-        
         if (new_user.id == 0) {
             res.status = 500;
             res.set_content("{\"error\":\"Registration failed\"}", "application/json");
             return;
-        }
-        
+        } 
         // Генерация токенa
         string token = AuthService::generateToken(new_user.id, new_user.username);
-        
-        cout << " User registered: " << username << " (ID: " << new_user.id << ")" << endl;
+        app_logger.info(" User registered: " + username + " (ID: " + to_string(new_user.id) + ")");
         res.set_content(new_user.to_json_with_token(token), "application/json");
         res.status = 201;
     });
@@ -300,7 +297,7 @@ int main() {
     //4. LOGIN
 
     server.Post("/api/login", [](const httplib::Request& req, httplib::Response& res) {
-        cout << "Login request" << endl;
+        app_logger.debug("Login request");
         
         auto params = parse_simple_json(req.body);
         string username = params["username"];
@@ -325,7 +322,7 @@ int main() {
         res.set_header("Set-Cookie", 
             "auth_token=" + token + "; HttpOnly; Path=/; Max-Age=" + to_string(24 * 3600));
         
-        cout << "User logged in: " << username << " (ID: " << user.id << ")" << endl;
+        app_logger.info("User logged in: " + username + " (ID: " + to_string(user.id) + ")");
         res.set_content(user.to_json_with_token(token), "application/json");
     });
 
@@ -468,8 +465,7 @@ int main() {
                 res.set_content("{\"error\":\"Failed to create todo\"}", "application/json");
                 return;
             }
-            
-            cout << "Todo created for user '" << username << "', ID: " << created.id << endl;
+            app_logger.info("Todo created for user '" + username + "', ID: " + to_string(created.id));
             res.set_content(created.to_json(), "application/json");
             res.status = 201;
         });
@@ -495,7 +491,7 @@ int main() {
     
     // 4. UPDATE TASK
     server.Put(R"(/api/todos/(\d+))", [](const httplib::Request& req, httplib::Response& res) {
-    protected_endpoint(req, res, db,
+        protected_endpoint(req, res, db,
             [](const httplib::Request& req, httplib::Response& res, Database* db, int user_id, string username) {
         int id = stoi(req.matches[1]);
     
@@ -505,35 +501,40 @@ int main() {
         updatedTodo.id = id; 
         updatedTodo.user_id = user_id;
         // Логируем 
-        cout << "Парсинг JSON:" << endl;
-            cout << "   ID: " << updatedTodo.id << endl;
-            cout << "   Title: " << updatedTodo.title << endl;
-            cout << "   Description: " << updatedTodo.description << endl;
-            cout << "   Completed: " << (updatedTodo.completed ? "true" : "false") << endl;
-            cout << "   Priority: " << updatedTodo.priority << endl;
-            cout << "   Due_date: " << updatedTodo.due_date << endl;
-            cout << "   Category_id: " << updatedTodo.category_id << endl;
-            cout << "   User_id: " << updatedTodo.user_id << endl;
+        stringstream ss;
+        ss << "Парсинг JSON:\n"
+            << "  ID: " << updatedTodo.id << "\n"
+            << "  Title: " << updatedTodo.title << "\n"
+            << "  Description: " << updatedTodo.description << "\n"
+            << "  Completed: " << (updatedTodo.completed ? "true" : "false") << "\n"
+            << "  Priority: " << updatedTodo.priority << "\n"
+            << "  Due_date: " << updatedTodo.due_date << "\n"
+            << "  Category_id: " << updatedTodo.category_id << "\n"
+            << "  User_id: " << updatedTodo.user_id;
+
+        app_logger.debug(ss.str());
 
         if (db->replaceTodo(updatedTodo, user_id)) {
             Todo todo = db->getTodoById(id, user_id);
             if (todo.id != 0) {
                 res.set_content(todo.to_json(), "application/json");
-                cout << "Successfully updated todo ID: " << id << endl;
+                app_logger.debug("Successfully updated todo ID: " + to_string(id));
             } else {
                 res.set_content("{\"error\":\"Todo not found after update\"}", "application/json");
                 res.status = 404;
-                cerr << "Todo not found after update, ID: " << id << endl;
+                app_logger.error("Todo not found after update, ID: " + to_string(id));
             }
         } else {
             res.set_content("{\"error\":\"Update failed\"}", "application/json");
             res.status = 500;
-            cerr << "Update failed for todo ID: " << id << endl;
+            app_logger.error("Update failed for todo ID: " + to_string(id));
         }
         } catch (const exception& e) {
         res.set_content(string("{\"error\":\"") + e.what() + "\"}", "application/json");
         res.status = 400;
-        cerr << "JSON parsing error: " << e.what() << endl;
+        stringstream ss;
+        ss << "JSON parsing error: " << e.what();
+        app_logger.error(ss.str());
         }
         });
     });
@@ -727,10 +728,7 @@ int main() {
                 res.set_content("{\"error\":\"Search query is required\",\"code\":400}", "application/json");
                 return;
             }
-            
-            cout << "Search request from user '" << username 
-                << "': \"" << query << "\"" << endl;
-            
+            app_logger.debug("Search request from user '" + username + "': \"" + query + "\"");
             const char* check_sql = "SELECT name FROM sqlite_master WHERE type='table' AND name='todos_fts'";
             sqlite3_stmt* check_stmt;
             bool fts_table_exists = false;
@@ -757,22 +755,19 @@ int main() {
             json << "\"query\":\"" << escape_json(query) << "\",";
             json << "\"count\":" << results.size() << ",";
             json << "\"results\":[";
-            
             for (size_t i = 0; i < results.size(); ++i) {
                 json << results[i].to_json();
                 if (i != results.size() - 1) json << ",";
             }
-            
             json << "]";
             json << "}";
             
             res.set_content(json.str(), "application/json");
-            cout << "Search completed, found " << results.size() << " results" << endl;
+            app_logger.debug("Search completed, found " + to_string(results.size()) + " results");
         });
     });
+    app_logger.info("Server running on http://localhost:8080");
 
- 
-    cout << "Server running on http://localhost:8080" << endl << endl;
     cout << "Press Ctrl+C to stop" << endl;
     cout << "======================================" << endl;
     

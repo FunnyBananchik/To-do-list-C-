@@ -3,6 +3,7 @@
 
 #include <string>
 #include <sstream>
+#include "Logger.h"
 
 using namespace std;
 
@@ -77,7 +78,9 @@ struct categories {
                             cat.user_id = stoi(user_id_temp);
                         }
                     } catch (const exception& e) {
-                        cerr << "Error parsing user_id: " << user_id_temp << " - " << e.what() << endl;
+                        stringstream ss;
+                        ss << "Error parsing user_id: " << user_id_temp << " - " << e.what();
+                        app_logger.error(ss.str());
                         cat.user_id = 0;
                     }
                 }
@@ -105,9 +108,5 @@ struct categories {
     }
 
 };
-
-
-
-
 
 #endif CATEGORIES_H

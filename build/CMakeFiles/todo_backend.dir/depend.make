@@ -9,6 +9,7 @@ CMakeFiles/todo_backend.dir/src/AuthService.cpp.o: ../jwt-cpp/include/jwt-cpp/tr
 CMakeFiles/todo_backend.dir/src/AuthService.cpp.o: ../jwt-cpp/include/jwt-cpp/traits/kazuho-picojson/traits.h
 CMakeFiles/todo_backend.dir/src/AuthService.cpp.o: ../src/AuthService.cpp
 CMakeFiles/todo_backend.dir/src/AuthService.cpp.o: ../src/AuthService.h
+CMakeFiles/todo_backend.dir/src/AuthService.cpp.o: ../src/Logger.h
 
 CMakeFiles/todo_backend.dir/src/main.cpp.o: ../jwt-cpp/include/jwt-cpp/jwt.h
 CMakeFiles/todo_backend.dir/src/main.cpp.o: ../jwt-cpp/include/picojson/picojson.h
@@ -22,6 +23,7 @@ CMakeFiles/todo_backend.dir/src/main.cpp.o: ../src/AuthService.h
 CMakeFiles/todo_backend.dir/src/main.cpp.o: ../src/AuthUtils.h
 CMakeFiles/todo_backend.dir/src/main.cpp.o: ../src/Categories.h
 CMakeFiles/todo_backend.dir/src/main.cpp.o: ../src/Database.h
+CMakeFiles/todo_backend.dir/src/main.cpp.o: ../src/Logger.h
 CMakeFiles/todo_backend.dir/src/main.cpp.o: ../src/Todo.h
 CMakeFiles/todo_backend.dir/src/main.cpp.o: ../src/User.h
 CMakeFiles/todo_backend.dir/src/main.cpp.o: ../src/main.cpp

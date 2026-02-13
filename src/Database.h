@@ -9,7 +9,7 @@
 #include "Categories.h"
 #include "AuthService.h"
 #include "User.h"
-
+#include "Logger.h"
 
 using namespace std;
 
@@ -91,10 +91,12 @@ class Database {
 
             int rc = sqlite3_open(path.c_str(), &db);
             if (rc != SQLITE_OK) {
-                cerr << "Cannot open database: " << sqlite3_errmsg(db) << endl;
+                app_logger.error("Cannot open database: " + string(sqlite3_errstr(rc)));
                 return false;
             }
-            cout << "Database opened: " << path << endl;
+            stringstream ss;
+            ss << "Database opened: " << path;
+            app_logger.info(ss.str());
             createTables(sql_users);
             createTables(sql_cat);
             createTables(sql_todos);
@@ -143,10 +145,10 @@ class Database {
             char* errMsg = nullptr;
             int rc = sqlite3_exec(db, sql, nullptr, nullptr, &errMsg);
             if (rc != SQLITE_OK) {
-                cerr << "SQL error: " << errMsg << endl;
+                app_logger.error("SQL error: " + string(sqlite3_errstr(rc)));
                 sqlite3_free(errMsg);
             } else {
-             cout << "Tables created/checked" << endl;
+                app_logger.debug("Tables created/checked");
             }
         }
 
@@ -156,7 +158,7 @@ class Database {
         sqlite3_stmt* stmt;
         
         if (sqlite3_prepare_v2(db, check_sql, -1, &stmt, nullptr) != SQLITE_OK) {
-            cerr << "Failed to check FTS table: " << sqlite3_errmsg(db) << endl;
+            app_logger.error("Failed to check FTS table: ");
             return;
         }
         
@@ -167,8 +169,7 @@ class Database {
         sqlite3_finalize(stmt);
         
         if (!fts_exists) {
-            cout << "FTS table not found, creating..." << endl;
-            
+            app_logger.debug("FTS table not found, creating...");
             const char* create_fts = R"(
                 CREATE VIRTUAL TABLE todos_fts USING fts5(
                     id UNINDEXED,
@@ -183,37 +184,36 @@ class Database {
             
             char* errMsg = nullptr;
             if (sqlite3_exec(db, create_fts, nullptr, nullptr, &errMsg) != SQLITE_OK) {
-                cerr << "Failed to create FTS table: " << errMsg << endl;
+                app_logger.error("Failed to create FTS table: ");
                 sqlite3_free(errMsg);
                 return;
             }
+            app_logger.debug("FTS table created");
+        }
+            populateFtsTable();
+        }
+
+
+        void populateFtsTable() {
+        
+            const char* clear_sql = "DELETE FROM todos_fts";
+            sqlite3_exec(db, clear_sql, nullptr, nullptr, nullptr);
             
-            cout << "FTS table created" << endl;
+            const char* sql = R"(
+                INSERT INTO todos_fts(rowid, id, user_id, title, description)
+                SELECT rowid, id, user_id, title, description FROM todos
+                WHERE rowid NOT IN (SELECT rowid FROM todos_fts)
+            )";
+            
+            char* errMsg = nullptr;
+            int rc = sqlite3_exec(db, sql, nullptr, nullptr, &errMsg);
+            if (rc != SQLITE_OK) {
+                app_logger.error("Error populating FTS table: " + string(sqlite3_errstr(rc)));
+                sqlite3_free(errMsg);
+            } else {
+                app_logger.debug("FTS table populated with existing data");
+            }
         }
-        populateFtsTable();
-    }
-
-
-    void populateFtsTable() {
-        
-        const char* clear_sql = "DELETE FROM todos_fts";
-        sqlite3_exec(db, clear_sql, nullptr, nullptr, nullptr);
-        
-        const char* sql = R"(
-            INSERT INTO todos_fts(rowid, id, user_id, title, description)
-            SELECT rowid, id, user_id, title, description FROM todos
-            WHERE rowid NOT IN (SELECT rowid FROM todos_fts)
-        )";
-        
-        char* errMsg = nullptr;
-        int rc = sqlite3_exec(db, sql, nullptr, nullptr, &errMsg);
-        if (rc != SQLITE_OK) {
-            cerr << "Error populating FTS table: " << errMsg << endl;
-            sqlite3_free(errMsg);
-        } else {
-            cout << "FTS table populated with existing data" << endl;
-        }
-    }
 
         //_______________________________Поиск_________________________________________
 
@@ -274,14 +274,13 @@ class Database {
         
         sqlite3_stmt* stmt;
         if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
-            cerr << "Failed to prepare search statement: " << sqlite3_errmsg(db) << endl;
+            stringstream ss;
+            ss << "Failed to prepare search statement: " << sqlite3_errmsg(db);
+            app_logger.error(ss.str());
             return results;
         }
-        
         sqlite3_bind_int(stmt, 1, user_id);
-        
-        cout << "FTS query: '" << fts_query << "'" << endl;
-        
+        app_logger.debug("FTS query: '" + fts_query + "'");
         sqlite3_bind_text(stmt, 2, fts_query.c_str(), -1, SQLITE_TRANSIENT);
         
         while (sqlite3_step(stmt) == SQLITE_ROW) {
@@ -328,7 +327,7 @@ class Database {
         sqlite3_finalize(stmt);
         
         if (results.empty()) {
-            cout << "FTS returned no results, using LIKE fallback" << endl;
+            app_logger.warn("FTS returned no results, using LIKE fallback");
             return searchTodosFallback(user_id, query);
         }
         
@@ -357,7 +356,9 @@ class Database {
         
         sqlite3_stmt* stmt;
         if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
-            cerr << "Failed to prepare fallback search statement: " << sqlite3_errmsg(db) << endl;
+            stringstream ss;
+            ss << "Failed to prepare search statement: " << sqlite3_errmsg(db);
+            app_logger.error(ss.str());
             return results;
         }
         
@@ -470,7 +471,9 @@ class Database {
             
             int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
             if (rc != SQLITE_OK) {
-                cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << endl;
+                stringstream ss;
+                ss << "Failed to prepare search statement: " << sqlite3_errmsg(db);
+                app_logger.error(ss.str());
                 return Todo("", "");
             }
             
@@ -483,7 +486,9 @@ class Database {
             
             rc = sqlite3_step(stmt);
             if (rc != SQLITE_DONE) {
-                cerr << "Failed to insert: " << sqlite3_errmsg(db) << endl;
+                stringstream ss;
+                ss << "Failed to insert: " << sqlite3_errmsg(db);
+                app_logger.error(ss.str());
                 sqlite3_finalize(stmt);
                 return Todo("", "");
             }
@@ -501,7 +506,9 @@ class Database {
             sqlite3_stmt* stmt;
             int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
             if (rc != SQLITE_OK) {
-                cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << endl;
+                stringstream ss;
+                ss << "Failed to prepare search statement: " << sqlite3_errmsg(db);
+                app_logger.error(ss.str());
                 return Todos;
             }
             sqlite3_bind_int(stmt, 1, user_id);
@@ -531,7 +538,9 @@ class Database {
             sqlite3_stmt* stmt;
             int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
             if (rc != SQLITE_OK) {
-                cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << endl;
+                stringstream ss;
+                ss << "Failed to prepare search statement: " << sqlite3_errmsg(db);
+                app_logger.error(ss.str());
                 return Todo("", "");
             }
             sqlite3_bind_int(stmt, 1, id);
@@ -563,7 +572,9 @@ class Database {
         sqlite3_stmt* stmt;
         int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
         if (rc != SQLITE_OK) {
-            cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << endl;
+            stringstream ss;
+            ss << "Failed to prepare search statement: " << sqlite3_errmsg(db);
+            app_logger.error(ss.str());
             return false;
         }
         sqlite3_bind_text(stmt, 1, todo.title.c_str(), -1, SQLITE_TRANSIENT);
@@ -578,7 +589,9 @@ class Database {
         bool success = (rc == SQLITE_DONE);
 
         if (!success) {
-            cerr << "Failed to update: " << sqlite3_errmsg(db) << endl;
+            stringstream ss;
+            ss << "Failed to update: "<< sqlite3_errmsg(db);
+            app_logger.error(ss.str());
         }
         
         sqlite3_finalize(stmt);
@@ -590,7 +603,9 @@ class Database {
         sqlite3_stmt* stmt;
         int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
         if (rc != SQLITE_OK) {
-            cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << endl;
+            stringstream ss;
+            ss << "Failed to prepare search statement: " << sqlite3_errmsg(db);
+            app_logger.error(ss.str());
             return false;
         }
 
@@ -599,7 +614,9 @@ class Database {
         bool success = (rc == SQLITE_DONE);
         
         if (!success) {
-            cerr << "Failed to delete: " << sqlite3_errmsg(db) << endl;
+            stringstream ss;
+            ss << "Failed to delete: " << sqlite3_errmsg(db);
+            app_logger.error(ss.str());
         }
         
         sqlite3_finalize(stmt);
@@ -612,7 +629,9 @@ class Database {
         sqlite3_stmt* stmt;
         int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
         if (rc != SQLITE_OK) {
-            cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << endl;
+            stringstream ss;
+            ss << "Failed to prepare search statement: " << sqlite3_errmsg(db);
+            app_logger.error(ss.str());
             return todos_temp;
         }
         sqlite3_bind_int(stmt, 1, user_id);
@@ -644,7 +663,9 @@ class Database {
         sqlite3_stmt* stmt;
         int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
         if (rc != SQLITE_OK) {
-            cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << endl;
+            stringstream ss;
+            ss << "Failed to prepare search statement: " << sqlite3_errmsg(db);
+            app_logger.error(ss.str());
             return todos_temp;
         }
         sqlite3_bind_int(stmt, 1, user_id);
@@ -709,7 +730,9 @@ class Database {
         
         int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
         if (rc != SQLITE_OK) {
-            cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << endl;
+            stringstream ss;
+            ss << "Failed to prepare search statement: " << sqlite3_errmsg(db);
+            app_logger.error(ss.str());
             return false;
         }
         
@@ -729,9 +752,9 @@ class Database {
         bool success = (rc == SQLITE_DONE);
         
         if (success) {
-            cout << "Todo replaced, ID: " << todo.id << endl;
+            app_logger.info("Todo replaced, ID: " + to_string(todo.id));
         } else {
-            cerr << "Failed to replace todo ID " << todo.id << ": " << sqlite3_errmsg(db) << endl;
+            app_logger.error("Failed to replace todo ID " + to_string(todo.id) + ": " + string(sqlite3_errstr(rc)));
         }
         
         sqlite3_finalize(stmt);
@@ -759,7 +782,9 @@ class Database {
         sqlite3_stmt* stmt;
         int rc = sqlite3_prepare_v2(db, sql.str().c_str(), -1, &stmt, nullptr);
         if (rc != SQLITE_OK) {
-            cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << endl;
+            stringstream ss;
+            ss << "Failed to prepare search statement: " << sqlite3_errmsg(db);
+            app_logger.error(ss.str());
             return todos;
         }
         
@@ -802,7 +827,9 @@ class Database {
             
             int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
             if (rc != SQLITE_OK) {
-                cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << endl;
+                stringstream ss;
+                ss << "Failed to prepare search statement: " << sqlite3_errmsg(db);
+                app_logger.error(ss.str());
                 return categories("", "", 0);
             }
             
@@ -812,7 +839,9 @@ class Database {
             
             rc = sqlite3_step(stmt);
             if (rc != SQLITE_DONE) {
-                cerr << "Failed to insert: " << sqlite3_errmsg(db) << endl;
+                stringstream ss;
+                ss << "Failed to insert: " << sqlite3_errmsg(db);
+                app_logger.error(ss.str());
                 sqlite3_finalize(stmt);
                 return categories("", "", 0);
             }
@@ -830,7 +859,9 @@ class Database {
             sqlite3_stmt* stmt;
             int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
             if (rc != SQLITE_OK) {
-                cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << endl;
+                stringstream ss;
+                ss << "Failed to prepare search statement: " << sqlite3_errmsg(db);
+                app_logger.error(ss.str());
                 return cat;
             }
             sqlite3_bind_int(stmt, 1, user_id);
@@ -850,7 +881,9 @@ class Database {
             sqlite3_stmt* stmt;
             int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
             if (rc != SQLITE_OK) {
-                cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << endl;
+                stringstream ss;
+                ss << "Failed to prepare search statement: " << sqlite3_errmsg(db);
+                app_logger.error(ss.str());
                 return categories("", "", 0);
             }
             sqlite3_bind_int(stmt, 1, id);
@@ -872,7 +905,9 @@ class Database {
         sqlite3_stmt* stmt;
         int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
         if (rc != SQLITE_OK) {
-            cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << endl;
+            stringstream ss;
+            ss << "Failed to prepare search statement: " << sqlite3_errmsg(db);
+            app_logger.error(ss.str());
             return false;
         }
 
@@ -881,7 +916,9 @@ class Database {
         bool success = (rc == SQLITE_DONE);
         
         if (!success) {
-            cerr << "Failed to delete: " << sqlite3_errmsg(db) << endl;
+            stringstream ss;
+            ss << "Failed to delete: " << sqlite3_errmsg(db);
+            app_logger.error(ss.str());
         }
         
         sqlite3_finalize(stmt);
@@ -900,7 +937,9 @@ class Database {
         
         int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
         if (rc != SQLITE_OK) {
-            cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << endl;
+            stringstream ss;
+            ss << "Failed to prepare search statement: " << sqlite3_errmsg(db);
+            app_logger.error(ss.str());
             return User();
         }
         
@@ -910,15 +949,16 @@ class Database {
         
         rc = sqlite3_step(stmt);
         if (rc != SQLITE_DONE) {
-            cerr << "Failed to register user: " << sqlite3_errmsg(db) << endl;
+            stringstream ss;
+            ss << "Failed to register user: " << sqlite3_errmsg(db);
+            app_logger.error(ss.str());
             sqlite3_finalize(stmt);
             return User();
         }
         
         int newId = sqlite3_last_insert_rowid(db);
         sqlite3_finalize(stmt);
-        
-        cout << "User registered: " << username << " (ID: " << newId << ")" << endl;
+        app_logger.info("User registered: " + username + " (ID: " + to_string(newId) + ")");
         return getUserById(newId);
     }
 
@@ -928,7 +968,9 @@ class Database {
         
         int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
         if (rc != SQLITE_OK) {
-            cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << endl;
+            stringstream ss;
+            ss << "Failed to prepare search statement: " << sqlite3_errmsg(db);
+            app_logger.error(ss.str());
             return User();
         }
         
@@ -946,13 +988,13 @@ class Database {
             if (input_hash == stored_hash) {
                 user.password_hash = stored_hash;
                 user.salt = salt;
-                cout << "User authenticated: " << username << endl;
+                app_logger.info("User authenticated: " + username);
             } else {
-                cout << "Invalid password for user: " << username << endl;
+                app_logger.warn("Invalid password for user: " + username);
                 user.id = 0; // Сбрасываем ID при неудачной аутентификации
             }
         } else {
-            cout << "User not found: " << username << endl;
+            app_logger.warn("User not found: ");
         }
         
         sqlite3_finalize(stmt);
@@ -965,7 +1007,9 @@ class Database {
         
         int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
         if (rc != SQLITE_OK) {
-            cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << endl;
+            stringstream ss;
+            ss << "Failed to prepare search statement: " << sqlite3_errmsg(db);
+            app_logger.error(ss.str());
             return User();
         }
         
@@ -987,7 +1031,9 @@ class Database {
         
         int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
         if (rc != SQLITE_OK) {
-            cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << endl;
+            stringstream ss;
+            ss << "Failed to prepare search statement: " << sqlite3_errmsg(db);
+            app_logger.error(ss.str());
             return false;
         }
         
@@ -1008,7 +1054,9 @@ class Database {
         
         int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
         if (rc != SQLITE_OK) {
-            cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << endl;
+            stringstream ss;
+            ss << "Failed to prepare search statement: " << sqlite3_errmsg(db);
+            app_logger.error(ss.str());
             return 0;
         }
         
@@ -1027,7 +1075,7 @@ class Database {
         
         if (!userExists(username)) {
             registerUser(username, password);
-            cout << "Created default user: " << username << "/" << password << endl;
+            app_logger.info("Created default user: " + username + "/" + password);
         }
     }
     

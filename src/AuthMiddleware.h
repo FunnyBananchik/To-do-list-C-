@@ -6,6 +6,7 @@
 #include <iostream> 
 #include <string>
 #include <map>
+#include "Logger.h"
 
 using namespace std;
 
@@ -23,16 +24,14 @@ public:
         
         return "";
     }
-
      static bool requireAuth(const string& auth_header, int& user_id, string& username) {
         string token = extractToken(auth_header);
         
         if (token.empty()) {
-            cerr << "No token provided in Authorization header" << endl;
+            app_logger.error("No token provided in Authorization header");
             return false;
         }
-        
-        cout << "Validating token: " << token.substr(0, 20) << "..." << endl;
+        app_logger.info("Validating token: " + token.substr(0, 20) + "...");
         return AuthService::validateToken(token, user_id, username);
     }
 
@@ -58,6 +57,5 @@ public:
     }
 
 };
-
 
 #endif

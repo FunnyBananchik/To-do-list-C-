@@ -6,6 +6,7 @@
 #include "../jwt-cpp/include/jwt-cpp/jwt.h"
 #include <openssl/sha.h>
 #include <iostream>
+#include "Logger.h"
 
 using namespace std;
 
@@ -30,7 +31,9 @@ public:
             
             return token;
         } catch (const exception& e) {
-            cerr << "Error generating JWT: " << e.what() << endl;
+            stringstream ss;
+            ss << "Error generating JWT: " << e.what();
+            app_logger.error(ss.str());
             return "";
         }
     }
@@ -38,9 +41,7 @@ public:
 
      static bool validateToken(const string& token, int& user_id, string& username) {
         try {
-            cout << "Validating JWT token..." << endl;
-            
-          
+            app_logger.debug("Validating JWT token...");
             auto decoded = jwt::decode(token);
             auto verifier = jwt::verify()
                 .allow_algorithm(jwt::algorithm::hs256{SECRET_KEY})
@@ -50,13 +51,13 @@ public:
             string subject = decoded.get_subject();
             user_id = stoi(subject);
             username = decoded.get_payload_claim("username").as_string();
-            
-            cout << "Token valid for user: " << username << " (ID: " << user_id << ")" << endl;
+            app_logger.info("Token valid for user: " + username + " (ID: " + to_string(user_id) + ")");
             return true;
             
         } catch (const std::exception& e) {
-          
-            cerr << "Token validation error: " << e.what() << endl;
+            stringstream ss;
+            ss << "Token validation error: " << e.what();
+            app_logger.error(ss.str());
             return false;
         }
     }

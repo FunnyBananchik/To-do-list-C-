@@ -10,6 +10,7 @@ CMakeFiles/todo_backend.dir/src/AuthService.cpp.o
  /home/user/todo-backend/jwt-cpp/include/jwt-cpp/traits/kazuho-picojson/traits.h
  /home/user/todo-backend/src/AuthService.cpp
  /home/user/todo-backend/src/AuthService.h
+ /home/user/todo-backend/src/Logger.h
 CMakeFiles/todo_backend.dir/src/main.cpp.o
  ../jwt-cpp/include/jwt-cpp/jwt.h
  ../jwt-cpp/include/picojson/picojson.h
@@ -23,6 +24,7 @@ CMakeFiles/todo_backend.dir/src/main.cpp.o
  /home/user/todo-backend/src/AuthUtils.h
  /home/user/todo-backend/src/Categories.h
  /home/user/todo-backend/src/Database.h
+ /home/user/todo-backend/src/Logger.h
  /home/user/todo-backend/src/Todo.h
  /home/user/todo-backend/src/User.h
  /home/user/todo-backend/src/main.cpp

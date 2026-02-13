@@ -331,6 +331,8 @@ string
 -
 map
 -
+Logger.h
+/home/user/todo-backend/src/Logger.h
 
 /home/user/todo-backend/src/AuthService.cpp
 AuthService.h
@@ -347,6 +349,8 @@ openssl/sha.h
 -
 iostream
 -
+Logger.h
+/home/user/todo-backend/src/Logger.h
 
 /home/user/todo-backend/src/AuthUtils.h
 string
@@ -361,6 +365,8 @@ string
 -
 sstream
 -
+Logger.h
+/home/user/todo-backend/src/Logger.h
 
 /home/user/todo-backend/src/Database.h
 sqlite3.h
@@ -379,6 +385,24 @@ AuthService.h
 /home/user/todo-backend/src/AuthService.h
 User.h
 /home/user/todo-backend/src/User.h
+Logger.h
+/home/user/todo-backend/src/Logger.h
+
+/home/user/todo-backend/src/Logger.h
+string
+-
+fstream
+-
+mutex
+-
+chrono
+-
+iomanip
+-
+sstream
+-
+iostream
+-
 
 /home/user/todo-backend/src/Todo.h
 string
@@ -387,6 +411,8 @@ sstream
 -
 ctime
 -
+Logger.h
+/home/user/todo-backend/src/Logger.h
 
 /home/user/todo-backend/src/User.h
 string
@@ -397,6 +423,8 @@ ctime
 -
 
 /home/user/todo-backend/src/main.cpp
+Logger.h
+/home/user/todo-backend/src/Logger.h
 ../httplib.h
 /home/user/todo-backend/httplib.h
 iostream

@@ -4,6 +4,7 @@
 #include <string>
 #include <sstream>
 #include <ctime>
+#include "Logger.h"
 
 using namespace std;
 
@@ -42,8 +43,8 @@ struct Todo {
                 strftime(due_buffer, sizeof(due_buffer), "%Y-%m-%d", &tm_due);
                 due_date = due_buffer;  
             } else {
-                due_date = "";  
-                cerr << "Ошибка парсинга даты: " << du << endl;
+                due_date = ""; 
+                app_logger.error("Ошибка парсинга даты: "+du);
             }
         } else due_date = ""; 
     }
@@ -166,7 +167,9 @@ struct Todo {
                         todo.category_id = stoi(cat_id_temp);
                     }
                 } catch (const exception& e) {
-                    cerr << "Error parsing category_id: " << cat_id_temp << " - " << e.what() << endl;
+                    stringstream ss;
+                    ss << "Error parsing category_id: " << cat_id_temp << " - " << e.what();
+                    app_logger.error(ss.str());
                     todo.category_id = 0;
                 }
             }
@@ -187,7 +190,9 @@ struct Todo {
                             todo.user_id = stoi(user_id_temp);
                         }
                     } catch (const exception& e) {
-                        cerr << "Error parsing user_id: " << user_id_temp << " - " << e.what() << endl;
+                        stringstream ss;
+                        ss << "Error parsing user_id: " << user_id_temp << " - " << e.what();
+                        app_logger.error(ss.str());
                         todo.user_id = 0;
                     }
                 }
