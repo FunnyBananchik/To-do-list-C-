@@ -5,6 +5,9 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <cctype>
+#include <codecvt>
+#include <algorithm>
 #include "Todo.h"
 #include "Categories.h"
 #include "AuthService.h"
@@ -12,6 +15,12 @@
 #include "Logger.h"
 
 using namespace std;
+
+#ifdef BUILD_TESTS
+    #define DATABASE_INSTANCE extern
+#else
+    #define DATABASE_INSTANCE
+#endif
 
 class Database {
     private:
@@ -82,7 +91,7 @@ class Database {
                 description,
                 content='todos',
                 content_rowid='rowid',
-                tokenize='unicode61 remove_diacritics 1 categories ''L* N* Co Ps Pe Pf Pd Pc Po Sc Sm Sk So Zl Zp Zs Cc Cf''',
+                tokenize = 'unicode61 remove_diacritics 1 tokenchars ''абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ''',
                 prefix='2,3'
                 );
             )";
@@ -219,216 +228,237 @@ class Database {
 
     vector<Todo> searchTodos(int user_id, const string& query, bool highlight = false) {
         vector<Todo> results;
-        
+    
         if (query.empty()) {
             return results;
         }
         
-        string safe_query = escapeFtsQuery(query);
-        string fts_query = safe_query;
-        
-        string sql;
-        if (highlight) {
-            sql = R"(
-                SELECT 
-                    t.id,
-                    t.title,
-                    t.description,
-                    t.completed,
-                    t.created_at,
-                    t.due_date,
-                    t.priority,
-                    t.category_id,
-                    t.user_id,
-                    snippet(todos_fts, 0, '<mark>', '</mark>', '…', 30) as title_snippet,
-                    snippet(todos_fts, 1, '<mark>', '</mark>', '…', 40) as desc_snippet,
-                    bm25(todos_fts) as relevance
-                FROM todos t
-                JOIN todos_fts ON t.rowid = todos_fts.rowid
-                WHERE t.user_id = ?
-                AND todos_fts MATCH ?
-                ORDER BY relevance DESC, t.created_at DESC
-                LIMIT 50
-            )";
-        } else {
-            sql = R"(
-                SELECT 
-                    t.id,
-                    t.title,
-                    t.description,
-                    t.completed,
-                    t.created_at,
-                    t.due_date,
-                    t.priority,
-                    t.category_id,
-                    t.user_id,
-                    bm25(todos_fts) as relevance
-                FROM todos t
-                JOIN todos_fts ON t.rowid = todos_fts.rowid
-                WHERE t.user_id = ?
-                AND todos_fts MATCH ?
-                ORDER BY relevance DESC, t.created_at DESC
-                LIMIT 50
-            )";
-        }
-        
-        sqlite3_stmt* stmt;
-        if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
-            stringstream ss;
-            ss << "Failed to prepare search statement: " << sqlite3_errmsg(db);
-            app_logger.error(ss.str());
-            return results;
-        }
-        sqlite3_bind_int(stmt, 1, user_id);
-        app_logger.debug("FTS query: '" + fts_query + "'");
-        sqlite3_bind_text(stmt, 2, fts_query.c_str(), -1, SQLITE_TRANSIENT);
-        
-        while (sqlite3_step(stmt) == SQLITE_ROW) {
-            Todo todo;
-            todo.id = sqlite3_column_int(stmt, 0);
-            
-            const char* title = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
-            todo.title = title ? title : "";
-            
-            const char* description = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
-            todo.description = description ? description : "";
-            
-            todo.completed = sqlite3_column_int(stmt, 3) == 1;
-            
-            const char* created_at = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 4));
-            todo.created_at = created_at ? created_at : "";
-            
-            const char* due_date = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 5));
-            todo.due_date = due_date ? due_date : "";
-            
-            todo.priority = sqlite3_column_int(stmt, 6);
-            todo.category_id = sqlite3_column_int(stmt, 7);
-            todo.user_id = sqlite3_column_int(stmt, 8);
-            
-            if (highlight) {
-                const char* title_snippet = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 9));
-                const char* desc_snippet = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 10));
-                
-                if (title_snippet) {
-                    todo.title_snippet = title_snippet;
-                }
-                if (desc_snippet) {
-                    todo.desc_snippet = desc_snippet;
-                }
-                
-                todo.relevance = sqlite3_column_double(stmt, 11);
-            } else if (sqlite3_column_count(stmt) > 9) {
-                todo.relevance = sqlite3_column_double(stmt, 9);
-            }
-            
-            results.push_back(todo);
-        }
-        
-        sqlite3_finalize(stmt);
-        
-        if (results.empty()) {
-            app_logger.warn("FTS returned no results, using LIKE fallback");
-            return searchTodosFallback(user_id, query);
-        }
-        
-        return results;
-    }
-
-
-    vector<Todo> searchTodosFallback(int user_id, const string& query) {
-        vector<Todo> results;
+        string fts_query = escapeFtsQuery(query);
         
         string sql = R"(
             SELECT 
-                id, title, description, completed, created_at, 
-                due_date, priority, category_id, user_id
-            FROM todos 
-            WHERE user_id = ?
-            AND (
-                title LIKE ? 
-                OR description LIKE ?
-                OR title LIKE ? 
-                OR description LIKE ?
-            )
-            ORDER BY created_at DESC
+                t.id,
+                t.title,
+                t.description,
+                t.completed,
+                t.created_at,
+                t.due_date,
+                t.priority,
+                t.category_id,
+                t.user_id,
+                bm25(todos_fts) as relevance
+            FROM todos t
+            JOIN todos_fts ON t.id = todos_fts.rowid
+            WHERE t.user_id = ?
+            AND todos_fts MATCH ?
+            ORDER BY relevance DESC, t.created_at DESC
             LIMIT 50
         )";
         
         sqlite3_stmt* stmt;
         if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
-            stringstream ss;
-            ss << "Failed to prepare search statement: " << sqlite3_errmsg(db);
-            app_logger.error(ss.str());
             return results;
         }
         
-        // Пробуем разные варианты поиска
-        string pattern1 = "%" + query + "%";
-        string pattern2 = query + "%";  // Начинается с запроса
-        
         sqlite3_bind_int(stmt, 1, user_id);
-        sqlite3_bind_text(stmt, 2, pattern1.c_str(), -1, SQLITE_TRANSIENT);
-        sqlite3_bind_text(stmt, 3, pattern1.c_str(), -1, SQLITE_TRANSIENT);
-        sqlite3_bind_text(stmt, 4, pattern2.c_str(), -1, SQLITE_TRANSIENT);
-        sqlite3_bind_text(stmt, 5, pattern2.c_str(), -1, SQLITE_TRANSIENT);
+        sqlite3_bind_text(stmt, 2, fts_query.c_str(), -1, SQLITE_TRANSIENT);
         
         while (sqlite3_step(stmt) == SQLITE_ROW) {
             Todo todo;
-            todo.id = sqlite3_column_int(stmt, 0);
+            int col = 0;
             
-            const char* title = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
+            todo.id = sqlite3_column_int(stmt, col++);
+            
+            const char* title = reinterpret_cast<const char*>(sqlite3_column_text(stmt, col++));
             todo.title = title ? title : "";
             
-            const char* description = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
+            const char* description = reinterpret_cast<const char*>(sqlite3_column_text(stmt, col++));
             todo.description = description ? description : "";
             
-            todo.completed = sqlite3_column_int(stmt, 3) == 1;
+            todo.completed = sqlite3_column_int(stmt, col++) == 1;
             
-            const char* created_at = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 4));
+            const char* created_at = reinterpret_cast<const char*>(sqlite3_column_text(stmt, col++));
             todo.created_at = created_at ? created_at : "";
             
-            const char* due_date = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 5));
+            const char* due_date = reinterpret_cast<const char*>(sqlite3_column_text(stmt, col++));
             todo.due_date = due_date ? due_date : "";
             
-            todo.priority = sqlite3_column_int(stmt, 6);
-            todo.category_id = sqlite3_column_int(stmt, 7);
-            todo.user_id = sqlite3_column_int(stmt, 8);
+            todo.priority = sqlite3_column_int(stmt, col++);
+            todo.category_id = sqlite3_column_int(stmt, col++);
+            todo.user_id = sqlite3_column_int(stmt, col++);
             
-            string lower_query = query;
-            string lower_title = todo.title;
-            string lower_desc = todo.description;
-            
-            transform(lower_query.begin(), lower_query.end(), lower_query.begin(), ::tolower);
-            transform(lower_title.begin(), lower_title.end(), lower_title.begin(), ::tolower);
-            transform(lower_desc.begin(), lower_desc.end(), lower_desc.begin(), ::tolower);
-            
-            // Простой расчет релевантности
-            double relevance = 0.0;
-            if (lower_title.find(lower_query) != string::npos) {
-                relevance += 2.0;
-                if (lower_title.find(lower_query) == 0) {
-                    relevance += 1.0; 
-                }
-            }
-            if (lower_desc.find(lower_query) != string::npos) {
-                relevance += 1.0;
-            }
-            
-            todo.relevance = relevance;
+            todo.relevance = sqlite3_column_double(stmt, col++);
             
             results.push_back(todo);
         }
         
         sqlite3_finalize(stmt);
         
-        // Сортируем по релевантности
-        sort(results.begin(), results.end(), [](const Todo& a, const Todo& b) {
-            return a.relevance > b.relevance;
-        });
+        if (highlight && !results.empty()) {
+            vector<string> search_terms = extractSearchTermsSimple(query);
+            
+            for (auto& todo : results) {
+                todo.title_snippet = createHighlightedSnippet(todo.title, search_terms);
+                if (!todo.description.empty()) {
+                    todo.desc_snippet = createHighlightedSnippet(todo.description, search_terms);
+                }
+            }
+        }
+        
+        if (results.empty()) {
+            results = searchTodosFallback(user_id, query);
+            
+            if (highlight && !results.empty()) {
+                vector<string> search_terms = extractSearchTermsSimple(query);
+                for (auto& todo : results) {
+                    todo.title_snippet = createHighlightedSnippet(todo.title, search_terms);
+                    if (!todo.description.empty()) {
+                        todo.desc_snippet = createHighlightedSnippet(todo.description, search_terms);
+                    }
+                }
+            }
+        }
         
         return results;
     }
 
+string createHighlightedSnippet(const string& text, const vector<string>& search_terms) {
+    if (text.empty() || search_terms.empty()) {
+        return text;
+    }
+    string result = text;
+    
+    for (const auto& term : search_terms) {
+        if (term.length() < 2) continue;
+        
+        string result_lower = toLowerSimple(result);
+        string term_lower = toLowerSimple(term);
+        
+        size_t pos = 0;
+        int offset = 0;
+        
+        while ((pos = result_lower.find(term_lower, pos)) != string::npos) {
+            result.insert(pos + offset, "<mark>");
+            offset += 6; 
+            
+            result.insert(pos + offset + term.length(), "</mark>");
+            offset += 7;
+            pos += term.length() + 13; 
+            
+            result_lower = toLowerSimple(result);
+        }
+    }
+    
+    return result;
+}
+
+// Конвертер UTF-8 <-> UTF-32
+std::wstring utf8_to_wstring(const std::string& str) {
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+    return converter.from_bytes(str);
+}
+
+std::string wstring_to_utf8(const std::wstring& wstr) {
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+    return converter.to_bytes(wstr);
+}
+
+std::string toLowerSimple(const std::string& str) {
+    std::wstring wstr = utf8_to_wstring(str);
+    
+    for (wchar_t& c : wstr) {
+        if (c >= L'A' && c <= L'Z') {
+            c = c + (L'a' - L'A');
+        }
+        else if (c >= L'А' && c <= L'Я') {
+            c = c + (L'а' - L'А');
+        }
+        else if (c == L'Ё') {
+            c = L'ё';
+        }
+    }
+    
+    return wstring_to_utf8(wstr);
+}
+
+vector<string> extractSearchTermsSimple(const string& query) {
+    vector<string> terms;
+    
+    string clean_query = query;
+    
+    if (clean_query.length() >= 2 && clean_query.front() == '"' && clean_query.back() == '"') {
+        clean_query = clean_query.substr(1, clean_query.length() - 2);
+    }
+    istringstream iss(clean_query);
+    string word;
+    while (iss >> word) {
+        if (word.length() < 2) continue;
+        
+        if (!word.empty() && word.back() == '*') {
+            word.pop_back();
+        }
+        
+        while (!word.empty() && ispunct(word.back())) {
+            word.pop_back();
+        }
+        
+        if (!word.empty()) {
+            terms.push_back(word);
+        }
+    }
+    
+    return terms;
+}
+
+    vector<Todo> searchTodosFallback(int user_id, const string& query) {
+        vector<Todo> results;
+        
+        if (query.empty()) {
+            return results;
+        }
+        
+        string sql = "SELECT id, title, description, completed, created_at, due_date, priority, category_id, user_id FROM todos WHERE user_id = ? AND (title LIKE ? OR description LIKE ?) ORDER BY created_at DESC LIMIT 50";
+        
+        sqlite3_stmt* stmt;
+        if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+            return results;
+        }
+        
+        string pattern = "%" + query + "%";
+        
+        sqlite3_bind_int(stmt, 1, user_id);
+        sqlite3_bind_text(stmt, 2, pattern.c_str(), -1, SQLITE_TRANSIENT);
+        sqlite3_bind_text(stmt, 3, pattern.c_str(), -1, SQLITE_TRANSIENT);
+        
+        while (sqlite3_step(stmt) == SQLITE_ROW) {
+            Todo todo;
+            todo.id = sqlite3_column_int(stmt, 0);
+            
+            const char* title = (const char*)sqlite3_column_text(stmt, 1);
+            todo.title = title ? title : "";
+            
+            const char* description = (const char*)sqlite3_column_text(stmt, 2);
+            todo.description = description ? description : "";
+            
+            todo.completed = sqlite3_column_int(stmt, 3) == 1;
+            
+            const char* created_at = (const char*)sqlite3_column_text(stmt, 4);
+            todo.created_at = created_at ? created_at : "";
+            
+            const char* due_date = (const char*)sqlite3_column_text(stmt, 5);
+            todo.due_date = due_date ? due_date : "";
+            
+            todo.priority = sqlite3_column_int(stmt, 6);
+            todo.category_id = sqlite3_column_int(stmt, 7);
+            todo.user_id = sqlite3_column_int(stmt, 8);
+            todo.relevance = 1.0;
+            
+            results.push_back(todo);
+        }
+        
+        sqlite3_finalize(stmt);
+        return results;
+    }
 
     string escapeFtsQuery(const string& query) {
         if (query.empty()) return "";
@@ -436,11 +466,10 @@ class Database {
         string escaped;
         escaped.reserve(query.length());
         
-        // FTS5 спецсимволы, которые нужно экранировать
-        const string special_chars = "\"'\\*^~-:";
+        const string special_chars = "\"'\\^~-:";
         
         for (char c : query) {
-            if (special_chars.find(c) != string::npos) {
+            if (c != '*' && special_chars.find(c) != string::npos) {
                 escaped += '\\';
             }
             escaped += c;
@@ -454,11 +483,18 @@ class Database {
         bool is_phrase = escaped.length() >= 2 && 
                         escaped.front() == '"' && 
                         escaped.back() == '"';
-        
+
         bool has_prefix = escaped.find('*') != string::npos;
 
-        if (!has_operators && !is_phrase && escaped.find(' ') != string::npos) {
-            escaped = "\"" + escaped + "\"";
+        if (has_prefix) {
+            if (escaped.back() != '*') {
+                size_t star_pos = escaped.find('*');
+                if (star_pos != string::npos) {
+                    if (star_pos < escaped.length() - 1 && escaped[star_pos + 1] == ' ') {
+                        escaped = escaped.substr(0, star_pos + 1);
+                    }
+                }
+            }
         }
         return escaped;
     }
@@ -620,12 +656,17 @@ class Database {
         }
         
         sqlite3_finalize(stmt);
+
+        if (success) {
+            int changes = sqlite3_changes(db);
+            return changes > 0; 
+        }
         return success;
     }
 
     vector<Todo> getOverdueTrue (int user_id){
         vector<Todo> todos_temp;
-        const char* sql = "SELECT id, title, description, completed, created_at, due_date, priority, category_id FROM todos WHERE due_date < datetime('now') AND completed = 0 AND due_date != '' AND user_id = ? ORDER BY due_date ASC;";
+        const char* sql = "SELECT id, title, description, completed, created_at, due_date, priority, category_id FROM todos WHERE due_date < date('now') AND completed = 0 AND due_date != '' AND user_id = ? ORDER BY due_date ASC;";
         sqlite3_stmt* stmt;
         int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
         if (rc != SQLITE_OK) {
@@ -1086,6 +1127,7 @@ class Database {
     }
 };
 
-Database* Database::instance = nullptr;
+//Database* Database::instance = nullptr;
+inline static Database* instance = nullptr;
 
 #endif

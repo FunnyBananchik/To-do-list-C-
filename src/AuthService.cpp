@@ -8,3 +8,5 @@ const string AuthService::SECRET_KEY = []() {
     }
     return std::string(key);
 }();
+
+const int AuthService::TOKEN_EXPIRY_HOURS = 24;

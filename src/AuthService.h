@@ -13,7 +13,7 @@ using namespace std;
 class AuthService {
 private:
     static const string SECRET_KEY;
-    static const int TOKEN_EXPIRY_HOURS = 24;
+    static const int TOKEN_EXPIRY_HOURS;
 
 public:
     // Генерация JWT токена

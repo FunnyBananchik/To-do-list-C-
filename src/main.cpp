@@ -9,6 +9,7 @@ Logger app_logger("logs/todo_server.log", DEBUG);
 #include <sstream>
 #include <ctime>
 #include <fstream>
+#include <clocale>
 #include <sys/stat.h>  
 #include <unistd.h>    
 #include "Todo.h"
@@ -195,6 +196,7 @@ void protected_endpoint(const httplib::Request& req,
 
 
 int main() {
+    setlocale(LC_ALL,"Russian");
     httplib::Server server;
     
     db = Database::getInstance();

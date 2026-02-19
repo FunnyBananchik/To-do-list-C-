@@ -25,7 +25,7 @@ struct Todo {
     
     // Конструктор для создания новой задачи (без ID)
     Todo(string t, string d = "", int k = 1, string du = "", int cat_id = 0, int uid = 0) 
-        : id(-1), title(t), description(d), completed(false), priority(k), category_id(cat_id), user_id(uid)
+        : id(-1), title(t), description(d), completed(false), priority(k), category_id(cat_id), user_id(uid), due_date(du)
     {
         // ID будет назначен базой данных
         time_t now = time(0);
@@ -34,10 +34,10 @@ struct Todo {
         strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", timeinfo);
         created_at = buffer;
 
-        if (!du.empty()) {
+        /*if (!du.empty()) {
             tm tm_due = {};
             istringstream ss(du);
-            ss >> get_time(&tm_due, "%d/%m/%Y");
+            ss >> get_time(&tm_due, "%Y-%m-%d");
             if (!ss.fail()) {
                 char due_buffer[20];
                 strftime(due_buffer, sizeof(due_buffer), "%Y-%m-%d", &tm_due);
@@ -47,6 +47,7 @@ struct Todo {
                 app_logger.error("Ошибка парсинга даты: "+du);
             }
         } else due_date = ""; 
+         */
     }
     
     // Конструктор по умолчанию (для БД)
