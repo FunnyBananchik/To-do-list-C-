@@ -1,0 +1,4 @@
+/home/user/todo-backend/tests/build_tests/CMakeFiles/rebuild_cache.dir
+/home/user/todo-backend/tests/build_tests/CMakeFiles/edit_cache.dir
+/home/user/todo-backend/tests/build_tests/CMakeFiles/run_tests.dir
+/home/user/todo-backend/tests/build_tests/CMakeFiles/test.dir
