@@ -13014,3 +13014,1165 @@
 [2026-02-19 14:56:43.908] [INFO ] Created default user: admin/admin123
 [2026-02-19 14:56:43.910] [INFO ] User registered: searchuser (ID: 2)
 [2026-02-19 14:56:43.927] [DEBUG] FTS table populated with existing data
+[2026-02-19 15:21:29.779] [INFO ] Validating token: eyJhbGciOiJIUzI1NiIs...
+[2026-02-19 15:21:29.780] [DEBUG] Validating JWT token...
+[2026-02-19 15:21:29.780] [INFO ] Token valid for user: authuser (ID: 100)
+[2026-02-19 15:21:29.780] [ERROR] No token provided in Authorization header
+[2026-02-19 15:21:29.780] [INFO ] Validating token: 545466jkllkjh1...
+[2026-02-19 15:21:29.780] [DEBUG] Validating JWT token...
+[2026-02-19 15:21:29.780] [ERROR] Token validation error: invalid token supplied
+[2026-02-19 15:21:29.780] [DEBUG] Validating JWT token...
+[2026-02-19 15:21:29.780] [INFO ] Token valid for user: adryt (ID: 42)
+[2026-02-19 15:21:31.783] [INFO ] Validating token: eyJhbGciOiJIUzI1NiIs...
+[2026-02-19 15:21:31.783] [DEBUG] Validating JWT token...
+[2026-02-19 15:21:31.783] [INFO ] Token valid for user: utiluser (ID: 101)
+[2026-02-19 15:21:31.783] [INFO ] Validating token: eyJhbGciOiJIUzI1NiIs...
+[2026-02-19 15:21:31.783] [DEBUG] Validating JWT token...
+[2026-02-19 15:21:31.783] [INFO ] Token valid for user: utiluser (ID: 101)
+[2026-02-19 15:21:31.784] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 15:21:31.784] [INFO ] Database opened: test.db
+[2026-02-19 15:21:31.791] [DEBUG] Tables created/checked
+[2026-02-19 15:21:31.794] [DEBUG] Tables created/checked
+[2026-02-19 15:21:31.797] [DEBUG] Tables created/checked
+[2026-02-19 15:21:31.804] [DEBUG] Tables created/checked
+[2026-02-19 15:21:31.804] [DEBUG] FTS table not found, creating...
+[2026-02-19 15:21:31.807] [DEBUG] FTS table created
+[2026-02-19 15:21:31.807] [DEBUG] FTS table populated with existing data
+[2026-02-19 15:21:31.810] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 15:21:31.810] [INFO ] Created default user: admin/admin123
+[2026-02-19 15:21:31.813] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 15:21:31.815] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 15:21:31.815] [INFO ] Database opened: test.db
+[2026-02-19 15:21:31.819] [DEBUG] Tables created/checked
+[2026-02-19 15:21:31.822] [DEBUG] Tables created/checked
+[2026-02-19 15:21:31.826] [DEBUG] Tables created/checked
+[2026-02-19 15:21:31.836] [DEBUG] Tables created/checked
+[2026-02-19 15:21:31.836] [DEBUG] FTS table not found, creating...
+[2026-02-19 15:21:31.839] [DEBUG] FTS table created
+[2026-02-19 15:21:31.839] [DEBUG] FTS table populated with existing data
+[2026-02-19 15:21:31.842] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 15:21:31.842] [INFO ] Created default user: admin/admin123
+[2026-02-19 15:21:31.845] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 15:21:31.858] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 15:21:31.858] [INFO ] Database opened: test.db
+[2026-02-19 15:21:31.861] [DEBUG] Tables created/checked
+[2026-02-19 15:21:31.864] [DEBUG] Tables created/checked
+[2026-02-19 15:21:31.867] [DEBUG] Tables created/checked
+[2026-02-19 15:21:31.874] [DEBUG] Tables created/checked
+[2026-02-19 15:21:31.874] [DEBUG] FTS table not found, creating...
+[2026-02-19 15:21:31.877] [DEBUG] FTS table created
+[2026-02-19 15:21:31.878] [DEBUG] FTS table populated with existing data
+[2026-02-19 15:21:31.881] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 15:21:31.881] [INFO ] Created default user: admin/admin123
+[2026-02-19 15:21:31.885] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 15:21:31.890] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 15:21:31.890] [INFO ] Database opened: test.db
+[2026-02-19 15:21:31.892] [DEBUG] Tables created/checked
+[2026-02-19 15:21:31.895] [DEBUG] Tables created/checked
+[2026-02-19 15:21:31.897] [DEBUG] Tables created/checked
+[2026-02-19 15:21:31.904] [DEBUG] Tables created/checked
+[2026-02-19 15:21:31.904] [DEBUG] FTS table not found, creating...
+[2026-02-19 15:21:31.907] [DEBUG] FTS table created
+[2026-02-19 15:21:31.907] [DEBUG] FTS table populated with existing data
+[2026-02-19 15:21:31.909] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 15:21:31.909] [INFO ] Created default user: admin/admin123
+[2026-02-19 15:21:31.911] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 15:21:31.915] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 15:21:31.915] [INFO ] Database opened: test.db
+[2026-02-19 15:21:31.918] [DEBUG] Tables created/checked
+[2026-02-19 15:21:31.921] [DEBUG] Tables created/checked
+[2026-02-19 15:21:31.925] [DEBUG] Tables created/checked
+[2026-02-19 15:21:31.930] [DEBUG] Tables created/checked
+[2026-02-19 15:21:31.930] [DEBUG] FTS table not found, creating...
+[2026-02-19 15:21:31.933] [DEBUG] FTS table created
+[2026-02-19 15:21:31.934] [DEBUG] FTS table populated with existing data
+[2026-02-19 15:21:31.936] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 15:21:31.936] [INFO ] Created default user: admin/admin123
+[2026-02-19 15:21:31.939] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 15:21:31.947] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 15:21:31.947] [INFO ] Database opened: test.db
+[2026-02-19 15:21:31.950] [DEBUG] Tables created/checked
+[2026-02-19 15:21:31.953] [DEBUG] Tables created/checked
+[2026-02-19 15:21:31.958] [DEBUG] Tables created/checked
+[2026-02-19 15:21:31.963] [DEBUG] Tables created/checked
+[2026-02-19 15:21:31.963] [DEBUG] FTS table not found, creating...
+[2026-02-19 15:21:31.966] [DEBUG] FTS table created
+[2026-02-19 15:21:31.966] [DEBUG] FTS table populated with existing data
+[2026-02-19 15:21:31.967] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 15:21:31.967] [INFO ] Created default user: admin/admin123
+[2026-02-19 15:21:31.970] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 15:21:31.974] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 15:21:31.974] [INFO ] Database opened: test.db
+[2026-02-19 15:21:31.976] [DEBUG] Tables created/checked
+[2026-02-19 15:21:31.978] [DEBUG] Tables created/checked
+[2026-02-19 15:21:31.981] [DEBUG] Tables created/checked
+[2026-02-19 15:21:31.987] [DEBUG] Tables created/checked
+[2026-02-19 15:21:31.987] [DEBUG] FTS table not found, creating...
+[2026-02-19 15:21:31.991] [DEBUG] FTS table created
+[2026-02-19 15:21:31.992] [DEBUG] FTS table populated with existing data
+[2026-02-19 15:21:31.994] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 15:21:31.994] [INFO ] Created default user: admin/admin123
+[2026-02-19 15:21:31.996] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 15:21:32.000] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 15:21:32.000] [INFO ] Database opened: test.db
+[2026-02-19 15:21:32.002] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.005] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.007] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.013] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.013] [DEBUG] FTS table not found, creating...
+[2026-02-19 15:21:32.017] [DEBUG] FTS table created
+[2026-02-19 15:21:32.017] [DEBUG] FTS table populated with existing data
+[2026-02-19 15:21:32.019] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 15:21:32.020] [INFO ] Created default user: admin/admin123
+[2026-02-19 15:21:32.022] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 15:21:32.024] [INFO ] User registered: nonexistent (ID: 3)
+[2026-02-19 15:21:32.024] [INFO ] User authenticated: testuser
+[2026-02-19 15:21:32.024] [WARN ] Invalid password for user: testuser
+[2026-02-19 15:21:32.024] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 15:21:32.024] [INFO ] Database opened: test.db
+[2026-02-19 15:21:32.027] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.029] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.032] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.038] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.038] [DEBUG] FTS table not found, creating...
+[2026-02-19 15:21:32.040] [DEBUG] FTS table created
+[2026-02-19 15:21:32.041] [DEBUG] FTS table populated with existing data
+[2026-02-19 15:21:32.043] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 15:21:32.043] [INFO ] Created default user: admin/admin123
+[2026-02-19 15:21:32.045] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 15:21:32.056] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 15:21:32.056] [INFO ] Database opened: search_test.db
+[2026-02-19 15:21:32.058] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.061] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.065] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.070] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.070] [DEBUG] FTS table not found, creating...
+[2026-02-19 15:21:32.073] [DEBUG] FTS table created
+[2026-02-19 15:21:32.074] [DEBUG] FTS table populated with existing data
+[2026-02-19 15:21:32.075] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 15:21:32.076] [INFO ] Created default user: admin/admin123
+[2026-02-19 15:21:32.077] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 15:21:32.089] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 15:21:32.089] [INFO ] Database opened: search_test.db
+[2026-02-19 15:21:32.091] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.093] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.096] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.101] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.102] [DEBUG] FTS table not found, creating...
+[2026-02-19 15:21:32.105] [DEBUG] FTS table created
+[2026-02-19 15:21:32.105] [DEBUG] FTS table populated with existing data
+[2026-02-19 15:21:32.107] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 15:21:32.107] [INFO ] Created default user: admin/admin123
+[2026-02-19 15:21:32.109] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 15:21:32.121] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 15:21:32.121] [INFO ] Database opened: search_test.db
+[2026-02-19 15:21:32.124] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.126] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.129] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.134] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.134] [DEBUG] FTS table not found, creating...
+[2026-02-19 15:21:32.138] [DEBUG] FTS table created
+[2026-02-19 15:21:32.138] [DEBUG] FTS table populated with existing data
+[2026-02-19 15:21:32.140] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 15:21:32.140] [INFO ] Created default user: admin/admin123
+[2026-02-19 15:21:32.142] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 15:21:32.153] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 15:21:32.153] [INFO ] Database opened: search_test.db
+[2026-02-19 15:21:32.155] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.158] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.160] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.165] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.165] [DEBUG] FTS table not found, creating...
+[2026-02-19 15:21:32.168] [DEBUG] FTS table created
+[2026-02-19 15:21:32.168] [DEBUG] FTS table populated with existing data
+[2026-02-19 15:21:32.171] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 15:21:32.172] [INFO ] Created default user: admin/admin123
+[2026-02-19 15:21:32.174] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 15:21:32.183] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 15:21:32.183] [INFO ] Database opened: search_test.db
+[2026-02-19 15:21:32.186] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.188] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.190] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.196] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.196] [DEBUG] FTS table not found, creating...
+[2026-02-19 15:21:32.199] [DEBUG] FTS table created
+[2026-02-19 15:21:32.199] [DEBUG] FTS table populated with existing data
+[2026-02-19 15:21:32.201] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 15:21:32.201] [INFO ] Created default user: admin/admin123
+[2026-02-19 15:21:32.203] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 15:21:32.214] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 15:21:32.214] [INFO ] Database opened: search_test.db
+[2026-02-19 15:21:32.216] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.218] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.221] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.226] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.226] [DEBUG] FTS table not found, creating...
+[2026-02-19 15:21:32.230] [DEBUG] FTS table created
+[2026-02-19 15:21:32.230] [DEBUG] FTS table populated with existing data
+[2026-02-19 15:21:32.232] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 15:21:32.232] [INFO ] Created default user: admin/admin123
+[2026-02-19 15:21:32.234] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 15:21:32.245] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 15:21:32.245] [INFO ] Database opened: search_test.db
+[2026-02-19 15:21:32.247] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.249] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.252] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.258] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.258] [DEBUG] FTS table not found, creating...
+[2026-02-19 15:21:32.260] [DEBUG] FTS table created
+[2026-02-19 15:21:32.261] [DEBUG] FTS table populated with existing data
+[2026-02-19 15:21:32.263] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 15:21:32.263] [INFO ] Created default user: admin/admin123
+[2026-02-19 15:21:32.265] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 15:21:32.291] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 15:21:32.291] [INFO ] Database opened: search_test.db
+[2026-02-19 15:21:32.294] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.297] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.299] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.305] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.305] [DEBUG] FTS table not found, creating...
+[2026-02-19 15:21:32.307] [DEBUG] FTS table created
+[2026-02-19 15:21:32.307] [DEBUG] FTS table populated with existing data
+[2026-02-19 15:21:32.310] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 15:21:32.310] [INFO ] Created default user: admin/admin123
+[2026-02-19 15:21:32.313] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 15:21:32.336] [DEBUG] FTS table populated with existing data
+[2026-02-19 15:21:32.337] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 15:21:32.337] [INFO ] Database opened: search_test.db
+[2026-02-19 15:21:32.339] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.343] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.345] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.350] [DEBUG] Tables created/checked
+[2026-02-19 15:21:32.350] [DEBUG] FTS table not found, creating...
+[2026-02-19 15:21:32.353] [DEBUG] FTS table created
+[2026-02-19 15:21:32.353] [DEBUG] FTS table populated with existing data
+[2026-02-19 15:21:32.355] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 15:21:32.355] [INFO ] Created default user: admin/admin123
+[2026-02-19 15:21:32.357] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 15:21:32.384] [DEBUG] FTS table populated with existing data
+[2026-02-19 18:59:43.020] [INFO ] Validating token: eyJhbGciOiJIUzI1NiIs...
+[2026-02-19 18:59:43.021] [DEBUG] Validating JWT token...
+[2026-02-19 18:59:43.022] [INFO ] Token valid for user: authuser (ID: 100)
+[2026-02-19 18:59:43.022] [ERROR] No token provided in Authorization header
+[2026-02-19 18:59:43.022] [INFO ] Validating token: 545466jkllkjh1...
+[2026-02-19 18:59:43.022] [DEBUG] Validating JWT token...
+[2026-02-19 18:59:43.023] [ERROR] Token validation error: invalid token supplied
+[2026-02-19 18:59:43.023] [DEBUG] Validating JWT token...
+[2026-02-19 18:59:43.023] [INFO ] Token valid for user: adryt (ID: 42)
+[2026-02-19 18:59:45.034] [INFO ] Validating token: eyJhbGciOiJIUzI1NiIs...
+[2026-02-19 18:59:45.034] [DEBUG] Validating JWT token...
+[2026-02-19 18:59:45.035] [INFO ] Token valid for user: utiluser (ID: 101)
+[2026-02-19 18:59:45.035] [INFO ] Validating token: eyJhbGciOiJIUzI1NiIs...
+[2026-02-19 18:59:45.035] [DEBUG] Validating JWT token...
+[2026-02-19 18:59:45.035] [INFO ] Token valid for user: utiluser (ID: 101)
+[2026-02-19 18:59:45.035] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 18:59:45.035] [INFO ] Database opened: test.db
+[2026-02-19 18:59:45.043] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.047] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.051] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.056] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.056] [DEBUG] FTS table not found, creating...
+[2026-02-19 18:59:45.059] [DEBUG] FTS table created
+[2026-02-19 18:59:45.059] [DEBUG] FTS table populated with existing data
+[2026-02-19 18:59:45.061] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 18:59:45.061] [INFO ] Created default user: admin/admin123
+[2026-02-19 18:59:45.063] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 18:59:45.065] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 18:59:45.065] [INFO ] Database opened: test.db
+[2026-02-19 18:59:45.068] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.071] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.073] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.079] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.079] [DEBUG] FTS table not found, creating...
+[2026-02-19 18:59:45.082] [DEBUG] FTS table created
+[2026-02-19 18:59:45.082] [DEBUG] FTS table populated with existing data
+[2026-02-19 18:59:45.084] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 18:59:45.084] [INFO ] Created default user: admin/admin123
+[2026-02-19 18:59:45.087] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 18:59:45.094] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 18:59:45.094] [INFO ] Database opened: test.db
+[2026-02-19 18:59:45.099] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.102] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.106] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.111] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.112] [DEBUG] FTS table not found, creating...
+[2026-02-19 18:59:45.114] [DEBUG] FTS table created
+[2026-02-19 18:59:45.114] [DEBUG] FTS table populated with existing data
+[2026-02-19 18:59:45.117] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 18:59:45.117] [INFO ] Created default user: admin/admin123
+[2026-02-19 18:59:45.119] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 18:59:45.124] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 18:59:45.124] [INFO ] Database opened: test.db
+[2026-02-19 18:59:45.127] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.129] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.132] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.140] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.140] [DEBUG] FTS table not found, creating...
+[2026-02-19 18:59:45.143] [DEBUG] FTS table created
+[2026-02-19 18:59:45.144] [DEBUG] FTS table populated with existing data
+[2026-02-19 18:59:45.147] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 18:59:45.147] [INFO ] Created default user: admin/admin123
+[2026-02-19 18:59:45.149] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 18:59:45.154] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 18:59:45.154] [INFO ] Database opened: test.db
+[2026-02-19 18:59:45.157] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.159] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.162] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.167] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.167] [DEBUG] FTS table not found, creating...
+[2026-02-19 18:59:45.170] [DEBUG] FTS table created
+[2026-02-19 18:59:45.170] [DEBUG] FTS table populated with existing data
+[2026-02-19 18:59:45.172] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 18:59:45.172] [INFO ] Created default user: admin/admin123
+[2026-02-19 18:59:45.174] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 18:59:45.181] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 18:59:45.181] [INFO ] Database opened: test.db
+[2026-02-19 18:59:45.184] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.186] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.189] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.194] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.195] [DEBUG] FTS table not found, creating...
+[2026-02-19 18:59:45.197] [DEBUG] FTS table created
+[2026-02-19 18:59:45.197] [DEBUG] FTS table populated with existing data
+[2026-02-19 18:59:45.199] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 18:59:45.199] [INFO ] Created default user: admin/admin123
+[2026-02-19 18:59:45.201] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 18:59:45.204] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 18:59:45.205] [INFO ] Database opened: test.db
+[2026-02-19 18:59:45.208] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.210] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.213] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.218] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.218] [DEBUG] FTS table not found, creating...
+[2026-02-19 18:59:45.221] [DEBUG] FTS table created
+[2026-02-19 18:59:45.221] [DEBUG] FTS table populated with existing data
+[2026-02-19 18:59:45.223] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 18:59:45.223] [INFO ] Created default user: admin/admin123
+[2026-02-19 18:59:45.225] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 18:59:45.230] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 18:59:45.230] [INFO ] Database opened: test.db
+[2026-02-19 18:59:45.233] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.235] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.238] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.244] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.244] [DEBUG] FTS table not found, creating...
+[2026-02-19 18:59:45.247] [DEBUG] FTS table created
+[2026-02-19 18:59:45.247] [DEBUG] FTS table populated with existing data
+[2026-02-19 18:59:45.250] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 18:59:45.250] [INFO ] Created default user: admin/admin123
+[2026-02-19 18:59:45.252] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 18:59:45.255] [INFO ] User registered: nonexistent (ID: 3)
+[2026-02-19 18:59:45.255] [INFO ] User authenticated: testuser
+[2026-02-19 18:59:45.255] [WARN ] Invalid password for user: testuser
+[2026-02-19 18:59:45.255] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 18:59:45.255] [INFO ] Database opened: test.db
+[2026-02-19 18:59:45.258] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.261] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.263] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.269] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.269] [DEBUG] FTS table not found, creating...
+[2026-02-19 18:59:45.272] [DEBUG] FTS table created
+[2026-02-19 18:59:45.273] [DEBUG] FTS table populated with existing data
+[2026-02-19 18:59:45.275] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 18:59:45.275] [INFO ] Created default user: admin/admin123
+[2026-02-19 18:59:45.277] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 18:59:45.290] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 18:59:45.290] [INFO ] Database opened: search_test.db
+[2026-02-19 18:59:45.293] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.295] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.298] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.304] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.304] [DEBUG] FTS table not found, creating...
+[2026-02-19 18:59:45.308] [DEBUG] FTS table created
+[2026-02-19 18:59:45.308] [DEBUG] FTS table populated with existing data
+[2026-02-19 18:59:45.310] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 18:59:45.311] [INFO ] Created default user: admin/admin123
+[2026-02-19 18:59:45.312] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 18:59:45.323] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 18:59:45.324] [INFO ] Database opened: search_test.db
+[2026-02-19 18:59:45.326] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.329] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.332] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.341] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.341] [DEBUG] FTS table not found, creating...
+[2026-02-19 18:59:45.344] [DEBUG] FTS table created
+[2026-02-19 18:59:45.344] [DEBUG] FTS table populated with existing data
+[2026-02-19 18:59:45.346] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 18:59:45.346] [INFO ] Created default user: admin/admin123
+[2026-02-19 18:59:45.348] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 18:59:45.359] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 18:59:45.359] [INFO ] Database opened: search_test.db
+[2026-02-19 18:59:45.362] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.364] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.367] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.375] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.375] [DEBUG] FTS table not found, creating...
+[2026-02-19 18:59:45.378] [DEBUG] FTS table created
+[2026-02-19 18:59:45.378] [DEBUG] FTS table populated with existing data
+[2026-02-19 18:59:45.380] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 18:59:45.380] [INFO ] Created default user: admin/admin123
+[2026-02-19 18:59:45.382] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 18:59:45.395] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 18:59:45.395] [INFO ] Database opened: search_test.db
+[2026-02-19 18:59:45.398] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.400] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.402] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.408] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.408] [DEBUG] FTS table not found, creating...
+[2026-02-19 18:59:45.411] [DEBUG] FTS table created
+[2026-02-19 18:59:45.411] [DEBUG] FTS table populated with existing data
+[2026-02-19 18:59:45.413] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 18:59:45.413] [INFO ] Created default user: admin/admin123
+[2026-02-19 18:59:45.415] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 18:59:45.424] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 18:59:45.425] [INFO ] Database opened: search_test.db
+[2026-02-19 18:59:45.427] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.430] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.432] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.439] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.439] [DEBUG] FTS table not found, creating...
+[2026-02-19 18:59:45.442] [DEBUG] FTS table created
+[2026-02-19 18:59:45.442] [DEBUG] FTS table populated with existing data
+[2026-02-19 18:59:45.444] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 18:59:45.444] [INFO ] Created default user: admin/admin123
+[2026-02-19 18:59:45.447] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 18:59:45.457] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 18:59:45.457] [INFO ] Database opened: search_test.db
+[2026-02-19 18:59:45.460] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.463] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.465] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.475] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.475] [DEBUG] FTS table not found, creating...
+[2026-02-19 18:59:45.479] [DEBUG] FTS table created
+[2026-02-19 18:59:45.479] [DEBUG] FTS table populated with existing data
+[2026-02-19 18:59:45.481] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 18:59:45.481] [INFO ] Created default user: admin/admin123
+[2026-02-19 18:59:45.484] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 18:59:45.496] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 18:59:45.496] [INFO ] Database opened: search_test.db
+[2026-02-19 18:59:45.498] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.501] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.505] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.511] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.511] [DEBUG] FTS table not found, creating...
+[2026-02-19 18:59:45.514] [DEBUG] FTS table created
+[2026-02-19 18:59:45.514] [DEBUG] FTS table populated with existing data
+[2026-02-19 18:59:45.516] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 18:59:45.516] [INFO ] Created default user: admin/admin123
+[2026-02-19 18:59:45.518] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 18:59:45.549] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 18:59:45.549] [INFO ] Database opened: search_test.db
+[2026-02-19 18:59:45.553] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.556] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.559] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.565] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.565] [DEBUG] FTS table not found, creating...
+[2026-02-19 18:59:45.568] [DEBUG] FTS table created
+[2026-02-19 18:59:45.568] [DEBUG] FTS table populated with existing data
+[2026-02-19 18:59:45.571] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 18:59:45.571] [INFO ] Created default user: admin/admin123
+[2026-02-19 18:59:45.573] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 18:59:45.601] [DEBUG] FTS table populated with existing data
+[2026-02-19 18:59:45.602] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 18:59:45.603] [INFO ] Database opened: search_test.db
+[2026-02-19 18:59:45.607] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.610] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.612] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.619] [DEBUG] Tables created/checked
+[2026-02-19 18:59:45.619] [DEBUG] FTS table not found, creating...
+[2026-02-19 18:59:45.623] [DEBUG] FTS table created
+[2026-02-19 18:59:45.623] [DEBUG] FTS table populated with existing data
+[2026-02-19 18:59:45.626] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 18:59:45.627] [INFO ] Created default user: admin/admin123
+[2026-02-19 18:59:45.628] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 18:59:45.660] [DEBUG] FTS table populated with existing data
+[2026-02-19 19:02:37.880] [INFO ] Validating token: eyJhbGciOiJIUzI1NiIs...
+[2026-02-19 19:02:37.880] [DEBUG] Validating JWT token...
+[2026-02-19 19:02:37.880] [INFO ] Token valid for user: authuser (ID: 100)
+[2026-02-19 19:02:37.880] [ERROR] No token provided in Authorization header
+[2026-02-19 19:02:37.880] [INFO ] Validating token: 545466jkllkjh1...
+[2026-02-19 19:02:37.880] [DEBUG] Validating JWT token...
+[2026-02-19 19:02:37.881] [ERROR] Token validation error: invalid token supplied
+[2026-02-19 19:02:37.881] [DEBUG] Validating JWT token...
+[2026-02-19 19:02:37.881] [INFO ] Token valid for user: adryt (ID: 42)
+[2026-02-19 19:02:39.883] [INFO ] Validating token: eyJhbGciOiJIUzI1NiIs...
+[2026-02-19 19:02:39.883] [DEBUG] Validating JWT token...
+[2026-02-19 19:02:39.883] [INFO ] Token valid for user: utiluser (ID: 101)
+[2026-02-19 19:02:39.883] [INFO ] Validating token: eyJhbGciOiJIUzI1NiIs...
+[2026-02-19 19:02:39.883] [DEBUG] Validating JWT token...
+[2026-02-19 19:02:39.883] [INFO ] Token valid for user: utiluser (ID: 101)
+[2026-02-19 19:02:39.884] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 19:02:39.884] [INFO ] Database opened: test.db
+[2026-02-19 19:02:39.890] [DEBUG] Tables created/checked
+[2026-02-19 19:02:39.893] [DEBUG] Tables created/checked
+[2026-02-19 19:02:39.895] [DEBUG] Tables created/checked
+[2026-02-19 19:02:39.900] [DEBUG] Tables created/checked
+[2026-02-19 19:02:39.900] [DEBUG] FTS table not found, creating...
+[2026-02-19 19:02:39.903] [DEBUG] FTS table created
+[2026-02-19 19:02:39.903] [DEBUG] FTS table populated with existing data
+[2026-02-19 19:02:39.904] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 19:02:39.904] [INFO ] Created default user: admin/admin123
+[2026-02-19 19:02:39.906] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 19:02:39.908] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 19:02:39.908] [INFO ] Database opened: test.db
+[2026-02-19 19:02:39.910] [DEBUG] Tables created/checked
+[2026-02-19 19:02:39.912] [DEBUG] Tables created/checked
+[2026-02-19 19:02:39.914] [DEBUG] Tables created/checked
+[2026-02-19 19:02:39.919] [DEBUG] Tables created/checked
+[2026-02-19 19:02:39.919] [DEBUG] FTS table not found, creating...
+[2026-02-19 19:02:39.921] [DEBUG] FTS table created
+[2026-02-19 19:02:39.921] [DEBUG] FTS table populated with existing data
+[2026-02-19 19:02:39.923] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 19:02:39.923] [INFO ] Created default user: admin/admin123
+[2026-02-19 19:02:39.924] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 19:02:39.929] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 19:02:39.929] [INFO ] Database opened: test.db
+[2026-02-19 19:02:39.932] [DEBUG] Tables created/checked
+[2026-02-19 19:02:39.934] [DEBUG] Tables created/checked
+[2026-02-19 19:02:39.937] [DEBUG] Tables created/checked
+[2026-02-19 19:02:39.944] [DEBUG] Tables created/checked
+[2026-02-19 19:02:39.944] [DEBUG] FTS table not found, creating...
+[2026-02-19 19:02:39.949] [DEBUG] FTS table created
+[2026-02-19 19:02:39.950] [DEBUG] FTS table populated with existing data
+[2026-02-19 19:02:39.953] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 19:02:39.953] [INFO ] Created default user: admin/admin123
+[2026-02-19 19:02:39.955] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 19:02:39.958] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 19:02:39.959] [INFO ] Database opened: test.db
+[2026-02-19 19:02:39.961] [DEBUG] Tables created/checked
+[2026-02-19 19:02:39.964] [DEBUG] Tables created/checked
+[2026-02-19 19:02:39.966] [DEBUG] Tables created/checked
+[2026-02-19 19:02:39.972] [DEBUG] Tables created/checked
+[2026-02-19 19:02:39.972] [DEBUG] FTS table not found, creating...
+[2026-02-19 19:02:39.975] [DEBUG] FTS table created
+[2026-02-19 19:02:39.975] [DEBUG] FTS table populated with existing data
+[2026-02-19 19:02:39.977] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 19:02:39.977] [INFO ] Created default user: admin/admin123
+[2026-02-19 19:02:39.979] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 19:02:39.984] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 19:02:39.984] [INFO ] Database opened: test.db
+[2026-02-19 19:02:39.989] [DEBUG] Tables created/checked
+[2026-02-19 19:02:39.993] [DEBUG] Tables created/checked
+[2026-02-19 19:02:39.995] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.002] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.002] [DEBUG] FTS table not found, creating...
+[2026-02-19 19:02:40.005] [DEBUG] FTS table created
+[2026-02-19 19:02:40.005] [DEBUG] FTS table populated with existing data
+[2026-02-19 19:02:40.007] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 19:02:40.007] [INFO ] Created default user: admin/admin123
+[2026-02-19 19:02:40.009] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 19:02:40.019] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 19:02:40.019] [INFO ] Database opened: test.db
+[2026-02-19 19:02:40.022] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.025] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.027] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.031] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.031] [DEBUG] FTS table not found, creating...
+[2026-02-19 19:02:40.033] [DEBUG] FTS table created
+[2026-02-19 19:02:40.033] [DEBUG] FTS table populated with existing data
+[2026-02-19 19:02:40.035] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 19:02:40.035] [INFO ] Created default user: admin/admin123
+[2026-02-19 19:02:40.037] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 19:02:40.040] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 19:02:40.040] [INFO ] Database opened: test.db
+[2026-02-19 19:02:40.042] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.044] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.046] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.050] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.051] [DEBUG] FTS table not found, creating...
+[2026-02-19 19:02:40.053] [DEBUG] FTS table created
+[2026-02-19 19:02:40.053] [DEBUG] FTS table populated with existing data
+[2026-02-19 19:02:40.055] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 19:02:40.055] [INFO ] Created default user: admin/admin123
+[2026-02-19 19:02:40.057] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 19:02:40.061] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 19:02:40.061] [INFO ] Database opened: test.db
+[2026-02-19 19:02:40.063] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.066] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.069] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.074] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.074] [DEBUG] FTS table not found, creating...
+[2026-02-19 19:02:40.076] [DEBUG] FTS table created
+[2026-02-19 19:02:40.076] [DEBUG] FTS table populated with existing data
+[2026-02-19 19:02:40.078] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 19:02:40.078] [INFO ] Created default user: admin/admin123
+[2026-02-19 19:02:40.080] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 19:02:40.083] [INFO ] User registered: nonexistent (ID: 3)
+[2026-02-19 19:02:40.083] [INFO ] User authenticated: testuser
+[2026-02-19 19:02:40.083] [WARN ] Invalid password for user: testuser
+[2026-02-19 19:02:40.083] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 19:02:40.083] [INFO ] Database opened: test.db
+[2026-02-19 19:02:40.086] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.089] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.092] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.099] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.099] [DEBUG] FTS table not found, creating...
+[2026-02-19 19:02:40.102] [DEBUG] FTS table created
+[2026-02-19 19:02:40.103] [DEBUG] FTS table populated with existing data
+[2026-02-19 19:02:40.105] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 19:02:40.105] [INFO ] Created default user: admin/admin123
+[2026-02-19 19:02:40.108] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 19:02:40.117] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 19:02:40.117] [INFO ] Database opened: search_test.db
+[2026-02-19 19:02:40.120] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.123] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.126] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.132] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.132] [DEBUG] FTS table not found, creating...
+[2026-02-19 19:02:40.136] [DEBUG] FTS table created
+[2026-02-19 19:02:40.136] [DEBUG] FTS table populated with existing data
+[2026-02-19 19:02:40.138] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 19:02:40.138] [INFO ] Created default user: admin/admin123
+[2026-02-19 19:02:40.141] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 19:02:40.151] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 19:02:40.151] [INFO ] Database opened: search_test.db
+[2026-02-19 19:02:40.154] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.157] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.160] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.166] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.166] [DEBUG] FTS table not found, creating...
+[2026-02-19 19:02:40.169] [DEBUG] FTS table created
+[2026-02-19 19:02:40.170] [DEBUG] FTS table populated with existing data
+[2026-02-19 19:02:40.172] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 19:02:40.172] [INFO ] Created default user: admin/admin123
+[2026-02-19 19:02:40.174] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 19:02:40.183] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 19:02:40.183] [INFO ] Database opened: search_test.db
+[2026-02-19 19:02:40.186] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.189] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.192] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.198] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.198] [DEBUG] FTS table not found, creating...
+[2026-02-19 19:02:40.201] [DEBUG] FTS table created
+[2026-02-19 19:02:40.201] [DEBUG] FTS table populated with existing data
+[2026-02-19 19:02:40.203] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 19:02:40.204] [INFO ] Created default user: admin/admin123
+[2026-02-19 19:02:40.206] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 19:02:40.215] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 19:02:40.215] [INFO ] Database opened: search_test.db
+[2026-02-19 19:02:40.217] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.219] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.223] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.229] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.229] [DEBUG] FTS table not found, creating...
+[2026-02-19 19:02:40.232] [DEBUG] FTS table created
+[2026-02-19 19:02:40.233] [DEBUG] FTS table populated with existing data
+[2026-02-19 19:02:40.235] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 19:02:40.235] [INFO ] Created default user: admin/admin123
+[2026-02-19 19:02:40.237] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 19:02:40.248] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 19:02:40.248] [INFO ] Database opened: search_test.db
+[2026-02-19 19:02:40.251] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.253] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.255] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.261] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.261] [DEBUG] FTS table not found, creating...
+[2026-02-19 19:02:40.264] [DEBUG] FTS table created
+[2026-02-19 19:02:40.264] [DEBUG] FTS table populated with existing data
+[2026-02-19 19:02:40.266] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 19:02:40.266] [INFO ] Created default user: admin/admin123
+[2026-02-19 19:02:40.267] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 19:02:40.284] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 19:02:40.284] [INFO ] Database opened: search_test.db
+[2026-02-19 19:02:40.287] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.289] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.292] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.297] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.297] [DEBUG] FTS table not found, creating...
+[2026-02-19 19:02:40.300] [DEBUG] FTS table created
+[2026-02-19 19:02:40.300] [DEBUG] FTS table populated with existing data
+[2026-02-19 19:02:40.302] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 19:02:40.302] [INFO ] Created default user: admin/admin123
+[2026-02-19 19:02:40.303] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 19:02:40.314] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 19:02:40.314] [INFO ] Database opened: search_test.db
+[2026-02-19 19:02:40.316] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.318] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.320] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.325] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.325] [DEBUG] FTS table not found, creating...
+[2026-02-19 19:02:40.328] [DEBUG] FTS table created
+[2026-02-19 19:02:40.328] [DEBUG] FTS table populated with existing data
+[2026-02-19 19:02:40.329] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 19:02:40.330] [INFO ] Created default user: admin/admin123
+[2026-02-19 19:02:40.331] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 19:02:40.355] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 19:02:40.355] [INFO ] Database opened: search_test.db
+[2026-02-19 19:02:40.358] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.359] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.362] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.366] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.366] [DEBUG] FTS table not found, creating...
+[2026-02-19 19:02:40.369] [DEBUG] FTS table created
+[2026-02-19 19:02:40.369] [DEBUG] FTS table populated with existing data
+[2026-02-19 19:02:40.371] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 19:02:40.371] [INFO ] Created default user: admin/admin123
+[2026-02-19 19:02:40.373] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 19:02:40.394] [DEBUG] FTS table populated with existing data
+[2026-02-19 19:02:40.395] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 19:02:40.395] [INFO ] Database opened: search_test.db
+[2026-02-19 19:02:40.398] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.400] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.402] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.409] [DEBUG] Tables created/checked
+[2026-02-19 19:02:40.409] [DEBUG] FTS table not found, creating...
+[2026-02-19 19:02:40.411] [DEBUG] FTS table created
+[2026-02-19 19:02:40.412] [DEBUG] FTS table populated with existing data
+[2026-02-19 19:02:40.413] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 19:02:40.413] [INFO ] Created default user: admin/admin123
+[2026-02-19 19:02:40.415] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 19:02:40.444] [DEBUG] FTS table populated with existing data
+[2026-02-19 19:04:12.021] [INFO ] Validating token: eyJhbGciOiJIUzI1NiIs...
+[2026-02-19 19:04:12.021] [DEBUG] Validating JWT token...
+[2026-02-19 19:04:12.022] [INFO ] Token valid for user: authuser (ID: 100)
+[2026-02-19 19:04:12.022] [ERROR] No token provided in Authorization header
+[2026-02-19 19:04:12.022] [INFO ] Validating token: 545466jkllkjh1...
+[2026-02-19 19:04:12.022] [DEBUG] Validating JWT token...
+[2026-02-19 19:04:12.022] [ERROR] Token validation error: invalid token supplied
+[2026-02-19 19:04:12.022] [DEBUG] Validating JWT token...
+[2026-02-19 19:04:12.022] [INFO ] Token valid for user: adryt (ID: 42)
+[2026-02-19 19:04:14.028] [INFO ] Validating token: eyJhbGciOiJIUzI1NiIs...
+[2026-02-19 19:04:14.028] [DEBUG] Validating JWT token...
+[2026-02-19 19:04:14.028] [INFO ] Token valid for user: utiluser (ID: 101)
+[2026-02-19 19:04:14.028] [INFO ] Validating token: eyJhbGciOiJIUzI1NiIs...
+[2026-02-19 19:04:14.028] [DEBUG] Validating JWT token...
+[2026-02-19 19:04:14.028] [INFO ] Token valid for user: utiluser (ID: 101)
+[2026-02-19 19:04:14.029] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 19:04:14.029] [INFO ] Database opened: test.db
+[2026-02-19 19:04:14.045] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.049] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.053] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.059] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.059] [DEBUG] FTS table not found, creating...
+[2026-02-19 19:04:14.062] [DEBUG] FTS table created
+[2026-02-19 19:04:14.062] [DEBUG] FTS table populated with existing data
+[2026-02-19 19:04:14.064] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 19:04:14.064] [INFO ] Created default user: admin/admin123
+[2026-02-19 19:04:14.065] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 19:04:14.068] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 19:04:14.068] [INFO ] Database opened: test.db
+[2026-02-19 19:04:14.071] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.073] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.076] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.082] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.082] [DEBUG] FTS table not found, creating...
+[2026-02-19 19:04:14.085] [DEBUG] FTS table created
+[2026-02-19 19:04:14.085] [DEBUG] FTS table populated with existing data
+[2026-02-19 19:04:14.087] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 19:04:14.087] [INFO ] Created default user: admin/admin123
+[2026-02-19 19:04:14.089] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 19:04:14.097] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 19:04:14.097] [INFO ] Database opened: test.db
+[2026-02-19 19:04:14.101] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.104] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.107] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.113] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.113] [DEBUG] FTS table not found, creating...
+[2026-02-19 19:04:14.116] [DEBUG] FTS table created
+[2026-02-19 19:04:14.116] [DEBUG] FTS table populated with existing data
+[2026-02-19 19:04:14.117] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 19:04:14.117] [INFO ] Created default user: admin/admin123
+[2026-02-19 19:04:14.119] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 19:04:14.123] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 19:04:14.123] [INFO ] Database opened: test.db
+[2026-02-19 19:04:14.125] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.127] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.129] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.135] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.135] [DEBUG] FTS table not found, creating...
+[2026-02-19 19:04:14.138] [DEBUG] FTS table created
+[2026-02-19 19:04:14.138] [DEBUG] FTS table populated with existing data
+[2026-02-19 19:04:14.140] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 19:04:14.140] [INFO ] Created default user: admin/admin123
+[2026-02-19 19:04:14.141] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 19:04:14.146] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 19:04:14.146] [INFO ] Database opened: test.db
+[2026-02-19 19:04:14.149] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.152] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.155] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.161] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.161] [DEBUG] FTS table not found, creating...
+[2026-02-19 19:04:14.164] [DEBUG] FTS table created
+[2026-02-19 19:04:14.164] [DEBUG] FTS table populated with existing data
+[2026-02-19 19:04:14.166] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 19:04:14.167] [INFO ] Created default user: admin/admin123
+[2026-02-19 19:04:14.169] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 19:04:14.177] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 19:04:14.177] [INFO ] Database opened: test.db
+[2026-02-19 19:04:14.179] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.181] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.184] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.189] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.189] [DEBUG] FTS table not found, creating...
+[2026-02-19 19:04:14.191] [DEBUG] FTS table created
+[2026-02-19 19:04:14.191] [DEBUG] FTS table populated with existing data
+[2026-02-19 19:04:14.194] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 19:04:14.194] [INFO ] Created default user: admin/admin123
+[2026-02-19 19:04:14.196] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 19:04:14.202] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 19:04:14.202] [INFO ] Database opened: test.db
+[2026-02-19 19:04:14.205] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.208] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.210] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.215] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.215] [DEBUG] FTS table not found, creating...
+[2026-02-19 19:04:14.218] [DEBUG] FTS table created
+[2026-02-19 19:04:14.218] [DEBUG] FTS table populated with existing data
+[2026-02-19 19:04:14.220] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 19:04:14.220] [INFO ] Created default user: admin/admin123
+[2026-02-19 19:04:14.222] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 19:04:14.226] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 19:04:14.226] [INFO ] Database opened: test.db
+[2026-02-19 19:04:14.229] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.232] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.234] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.239] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.239] [DEBUG] FTS table not found, creating...
+[2026-02-19 19:04:14.241] [DEBUG] FTS table created
+[2026-02-19 19:04:14.241] [DEBUG] FTS table populated with existing data
+[2026-02-19 19:04:14.243] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 19:04:14.243] [INFO ] Created default user: admin/admin123
+[2026-02-19 19:04:14.244] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 19:04:14.246] [INFO ] User registered: nonexistent (ID: 3)
+[2026-02-19 19:04:14.246] [INFO ] User authenticated: testuser
+[2026-02-19 19:04:14.246] [WARN ] Invalid password for user: testuser
+[2026-02-19 19:04:14.246] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 19:04:14.246] [INFO ] Database opened: test.db
+[2026-02-19 19:04:14.249] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.251] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.254] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.262] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.262] [DEBUG] FTS table not found, creating...
+[2026-02-19 19:04:14.264] [DEBUG] FTS table created
+[2026-02-19 19:04:14.265] [DEBUG] FTS table populated with existing data
+[2026-02-19 19:04:14.266] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 19:04:14.266] [INFO ] Created default user: admin/admin123
+[2026-02-19 19:04:14.268] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 19:04:14.278] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 19:04:14.278] [INFO ] Database opened: search_test.db
+[2026-02-19 19:04:14.280] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.282] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.285] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.290] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.290] [DEBUG] FTS table not found, creating...
+[2026-02-19 19:04:14.293] [DEBUG] FTS table created
+[2026-02-19 19:04:14.293] [DEBUG] FTS table populated with existing data
+[2026-02-19 19:04:14.296] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 19:04:14.296] [INFO ] Created default user: admin/admin123
+[2026-02-19 19:04:14.298] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 19:04:14.309] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 19:04:14.309] [INFO ] Database opened: search_test.db
+[2026-02-19 19:04:14.311] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.314] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.316] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.321] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.321] [DEBUG] FTS table not found, creating...
+[2026-02-19 19:04:14.324] [DEBUG] FTS table created
+[2026-02-19 19:04:14.324] [DEBUG] FTS table populated with existing data
+[2026-02-19 19:04:14.327] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 19:04:14.327] [INFO ] Created default user: admin/admin123
+[2026-02-19 19:04:14.329] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 19:04:14.340] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 19:04:14.340] [INFO ] Database opened: search_test.db
+[2026-02-19 19:04:14.343] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.345] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.347] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.352] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.352] [DEBUG] FTS table not found, creating...
+[2026-02-19 19:04:14.355] [DEBUG] FTS table created
+[2026-02-19 19:04:14.355] [DEBUG] FTS table populated with existing data
+[2026-02-19 19:04:14.356] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 19:04:14.356] [INFO ] Created default user: admin/admin123
+[2026-02-19 19:04:14.358] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 19:04:14.371] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 19:04:14.371] [INFO ] Database opened: search_test.db
+[2026-02-19 19:04:14.374] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.377] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.379] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.384] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.384] [DEBUG] FTS table not found, creating...
+[2026-02-19 19:04:14.386] [DEBUG] FTS table created
+[2026-02-19 19:04:14.386] [DEBUG] FTS table populated with existing data
+[2026-02-19 19:04:14.388] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 19:04:14.388] [INFO ] Created default user: admin/admin123
+[2026-02-19 19:04:14.389] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 19:04:14.399] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 19:04:14.399] [INFO ] Database opened: search_test.db
+[2026-02-19 19:04:14.402] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.405] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.409] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.414] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.414] [DEBUG] FTS table not found, creating...
+[2026-02-19 19:04:14.417] [DEBUG] FTS table created
+[2026-02-19 19:04:14.417] [DEBUG] FTS table populated with existing data
+[2026-02-19 19:04:14.419] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 19:04:14.419] [INFO ] Created default user: admin/admin123
+[2026-02-19 19:04:14.421] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 19:04:14.430] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 19:04:14.430] [INFO ] Database opened: search_test.db
+[2026-02-19 19:04:14.432] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.435] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.437] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.444] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.444] [DEBUG] FTS table not found, creating...
+[2026-02-19 19:04:14.447] [DEBUG] FTS table created
+[2026-02-19 19:04:14.447] [DEBUG] FTS table populated with existing data
+[2026-02-19 19:04:14.449] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 19:04:14.449] [INFO ] Created default user: admin/admin123
+[2026-02-19 19:04:14.451] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 19:04:14.461] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 19:04:14.461] [INFO ] Database opened: search_test.db
+[2026-02-19 19:04:14.463] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.465] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.467] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.472] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.472] [DEBUG] FTS table not found, creating...
+[2026-02-19 19:04:14.474] [DEBUG] FTS table created
+[2026-02-19 19:04:14.474] [DEBUG] FTS table populated with existing data
+[2026-02-19 19:04:14.476] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 19:04:14.476] [INFO ] Created default user: admin/admin123
+[2026-02-19 19:04:14.477] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 19:04:14.502] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 19:04:14.502] [INFO ] Database opened: search_test.db
+[2026-02-19 19:04:14.504] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.506] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.508] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.513] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.513] [DEBUG] FTS table not found, creating...
+[2026-02-19 19:04:14.515] [DEBUG] FTS table created
+[2026-02-19 19:04:14.515] [DEBUG] FTS table populated with existing data
+[2026-02-19 19:04:14.519] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 19:04:14.519] [INFO ] Created default user: admin/admin123
+[2026-02-19 19:04:14.522] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 19:04:14.549] [DEBUG] FTS table populated with existing data
+[2026-02-19 19:04:14.550] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 19:04:14.550] [INFO ] Database opened: search_test.db
+[2026-02-19 19:04:14.553] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.556] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.558] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.564] [DEBUG] Tables created/checked
+[2026-02-19 19:04:14.564] [DEBUG] FTS table not found, creating...
+[2026-02-19 19:04:14.568] [DEBUG] FTS table created
+[2026-02-19 19:04:14.568] [DEBUG] FTS table populated with existing data
+[2026-02-19 19:04:14.570] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 19:04:14.570] [INFO ] Created default user: admin/admin123
+[2026-02-19 19:04:14.572] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 19:04:14.594] [DEBUG] FTS table populated with existing data
+[2026-02-19 20:25:57.530] [INFO ] Validating token: eyJhbGciOiJIUzI1NiIs...
+[2026-02-19 20:25:57.534] [DEBUG] Validating JWT token...
+[2026-02-19 20:25:57.534] [INFO ] Token valid for user: authuser (ID: 100)
+[2026-02-19 20:25:57.534] [ERROR] No token provided in Authorization header
+[2026-02-19 20:25:57.534] [INFO ] Validating token: 545466jkllkjh1...
+[2026-02-19 20:25:57.534] [DEBUG] Validating JWT token...
+[2026-02-19 20:25:57.534] [ERROR] Token validation error: invalid token supplied
+[2026-02-19 20:25:57.534] [DEBUG] Validating JWT token...
+[2026-02-19 20:25:57.535] [INFO ] Token valid for user: adryt (ID: 42)
+[2026-02-19 20:25:59.537] [INFO ] Validating token: eyJhbGciOiJIUzI1NiIs...
+[2026-02-19 20:25:59.537] [DEBUG] Validating JWT token...
+[2026-02-19 20:25:59.538] [INFO ] Token valid for user: utiluser (ID: 101)
+[2026-02-19 20:25:59.538] [INFO ] Validating token: eyJhbGciOiJIUzI1NiIs...
+[2026-02-19 20:25:59.538] [DEBUG] Validating JWT token...
+[2026-02-19 20:25:59.538] [INFO ] Token valid for user: utiluser (ID: 101)
+[2026-02-19 20:25:59.538] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 20:25:59.539] [INFO ] Database opened: test.db
+[2026-02-19 20:25:59.546] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.549] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.552] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.558] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.561] [INFO ] FTS table recreated and populated
+[2026-02-19 20:25:59.564] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 20:25:59.564] [INFO ] Created default user: admin/admin123
+[2026-02-19 20:25:59.566] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 20:25:59.570] [DEBUG] Closing database...
+[2026-02-19 20:25:59.570] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 20:25:59.570] [INFO ] Database opened: test.db
+[2026-02-19 20:25:59.576] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.580] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.583] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.589] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.592] [INFO ] FTS table recreated and populated
+[2026-02-19 20:25:59.594] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 20:25:59.594] [INFO ] Created default user: admin/admin123
+[2026-02-19 20:25:59.595] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 20:25:59.602] [DEBUG] Closing database...
+[2026-02-19 20:25:59.602] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 20:25:59.602] [INFO ] Database opened: test.db
+[2026-02-19 20:25:59.604] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.607] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.609] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.619] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.622] [INFO ] FTS table recreated and populated
+[2026-02-19 20:25:59.624] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 20:25:59.624] [INFO ] Created default user: admin/admin123
+[2026-02-19 20:25:59.626] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 20:25:59.630] [DEBUG] Closing database...
+[2026-02-19 20:25:59.630] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 20:25:59.630] [INFO ] Database opened: test.db
+[2026-02-19 20:25:59.633] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.636] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.639] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.646] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.650] [INFO ] FTS table recreated and populated
+[2026-02-19 20:25:59.652] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 20:25:59.653] [INFO ] Created default user: admin/admin123
+[2026-02-19 20:25:59.655] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 20:25:59.659] [DEBUG] Closing database...
+[2026-02-19 20:25:59.659] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 20:25:59.659] [INFO ] Database opened: test.db
+[2026-02-19 20:25:59.662] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.665] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.669] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.675] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.678] [INFO ] FTS table recreated and populated
+[2026-02-19 20:25:59.680] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 20:25:59.680] [INFO ] Created default user: admin/admin123
+[2026-02-19 20:25:59.682] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 20:25:59.690] [DEBUG] Closing database...
+[2026-02-19 20:25:59.690] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 20:25:59.690] [INFO ] Database opened: test.db
+[2026-02-19 20:25:59.693] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.695] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.698] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.704] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.708] [INFO ] FTS table recreated and populated
+[2026-02-19 20:25:59.710] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 20:25:59.710] [INFO ] Created default user: admin/admin123
+[2026-02-19 20:25:59.712] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 20:25:59.715] [DEBUG] Closing database...
+[2026-02-19 20:25:59.715] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 20:25:59.715] [INFO ] Database opened: test.db
+[2026-02-19 20:25:59.717] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.720] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.722] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.727] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.730] [INFO ] FTS table recreated and populated
+[2026-02-19 20:25:59.732] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 20:25:59.732] [INFO ] Created default user: admin/admin123
+[2026-02-19 20:25:59.734] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 20:25:59.739] [DEBUG] Closing database...
+[2026-02-19 20:25:59.739] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 20:25:59.739] [INFO ] Database opened: test.db
+[2026-02-19 20:25:59.742] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.744] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.747] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.752] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.754] [INFO ] FTS table recreated and populated
+[2026-02-19 20:25:59.756] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 20:25:59.756] [INFO ] Created default user: admin/admin123
+[2026-02-19 20:25:59.758] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 20:25:59.760] [INFO ] User registered: nonexistent (ID: 3)
+[2026-02-19 20:25:59.760] [INFO ] User authenticated: testuser
+[2026-02-19 20:25:59.760] [WARN ] Invalid password for user: testuser
+[2026-02-19 20:25:59.760] [DEBUG] Closing database...
+[2026-02-19 20:25:59.761] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 20:25:59.761] [INFO ] Database opened: test.db
+[2026-02-19 20:25:59.763] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.766] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.768] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.776] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.780] [INFO ] FTS table recreated and populated
+[2026-02-19 20:25:59.782] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 20:25:59.782] [INFO ] Created default user: admin/admin123
+[2026-02-19 20:25:59.784] [INFO ] User registered: testuser (ID: 2)
+[2026-02-19 20:25:59.797] [DEBUG] Closing database...
+[2026-02-19 20:25:59.798] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 20:25:59.798] [INFO ] Database opened: search_test.db
+[2026-02-19 20:25:59.802] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.805] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.807] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.812] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.815] [INFO ] FTS table recreated and populated
+[2026-02-19 20:25:59.817] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 20:25:59.817] [INFO ] Created default user: admin/admin123
+[2026-02-19 20:25:59.819] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 20:25:59.830] [DEBUG] Closing database...
+[2026-02-19 20:25:59.830] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 20:25:59.830] [INFO ] Database opened: search_test.db
+[2026-02-19 20:25:59.832] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.835] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.837] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.843] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.846] [INFO ] FTS table recreated and populated
+[2026-02-19 20:25:59.848] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 20:25:59.848] [INFO ] Created default user: admin/admin123
+[2026-02-19 20:25:59.850] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 20:25:59.862] [DEBUG] Closing database...
+[2026-02-19 20:25:59.862] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 20:25:59.862] [INFO ] Database opened: search_test.db
+[2026-02-19 20:25:59.867] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.871] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.873] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.878] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.881] [INFO ] FTS table recreated and populated
+[2026-02-19 20:25:59.884] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 20:25:59.885] [INFO ] Created default user: admin/admin123
+[2026-02-19 20:25:59.886] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 20:25:59.898] [DEBUG] Closing database...
+[2026-02-19 20:25:59.898] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 20:25:59.898] [INFO ] Database opened: search_test.db
+[2026-02-19 20:25:59.903] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.905] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.907] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.913] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.916] [INFO ] FTS table recreated and populated
+[2026-02-19 20:25:59.918] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 20:25:59.918] [INFO ] Created default user: admin/admin123
+[2026-02-19 20:25:59.920] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 20:25:59.931] [DEBUG] Closing database...
+[2026-02-19 20:25:59.931] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 20:25:59.931] [INFO ] Database opened: search_test.db
+[2026-02-19 20:25:59.934] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.936] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.939] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.945] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.948] [INFO ] FTS table recreated and populated
+[2026-02-19 20:25:59.950] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 20:25:59.950] [INFO ] Created default user: admin/admin123
+[2026-02-19 20:25:59.952] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 20:25:59.963] [DEBUG] Closing database...
+[2026-02-19 20:25:59.963] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 20:25:59.963] [INFO ] Database opened: search_test.db
+[2026-02-19 20:25:59.965] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.967] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.969] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.975] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.978] [INFO ] FTS table recreated and populated
+[2026-02-19 20:25:59.980] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 20:25:59.980] [INFO ] Created default user: admin/admin123
+[2026-02-19 20:25:59.982] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 20:25:59.993] [DEBUG] Closing database...
+[2026-02-19 20:25:59.994] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 20:25:59.994] [INFO ] Database opened: search_test.db
+[2026-02-19 20:25:59.997] [DEBUG] Tables created/checked
+[2026-02-19 20:25:59.999] [DEBUG] Tables created/checked
+[2026-02-19 20:26:00.014] [DEBUG] Tables created/checked
+[2026-02-19 20:26:00.024] [DEBUG] Tables created/checked
+[2026-02-19 20:26:00.029] [INFO ] FTS table recreated and populated
+[2026-02-19 20:26:00.031] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 20:26:00.031] [INFO ] Created default user: admin/admin123
+[2026-02-19 20:26:00.033] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 20:26:00.058] [DEBUG] Closing database...
+[2026-02-19 20:26:00.058] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 20:26:00.058] [INFO ] Database opened: search_test.db
+[2026-02-19 20:26:00.060] [DEBUG] Tables created/checked
+[2026-02-19 20:26:00.062] [DEBUG] Tables created/checked
+[2026-02-19 20:26:00.065] [DEBUG] Tables created/checked
+[2026-02-19 20:26:00.069] [DEBUG] Tables created/checked
+[2026-02-19 20:26:00.072] [INFO ] FTS table recreated and populated
+[2026-02-19 20:26:00.074] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 20:26:00.074] [INFO ] Created default user: admin/admin123
+[2026-02-19 20:26:00.076] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 20:26:00.099] [DEBUG] FTS table populated with existing data
+[2026-02-19 20:26:00.100] [DEBUG] Closing database...
+[2026-02-19 20:26:00.100] [ERROR] SQL error: bad parameter or other API misuse
+[2026-02-19 20:26:00.100] [INFO ] Database opened: search_test.db
+[2026-02-19 20:26:00.103] [DEBUG] Tables created/checked
+[2026-02-19 20:26:00.105] [DEBUG] Tables created/checked
+[2026-02-19 20:26:00.107] [DEBUG] Tables created/checked
+[2026-02-19 20:26:00.112] [DEBUG] Tables created/checked
+[2026-02-19 20:26:00.115] [INFO ] FTS table recreated and populated
+[2026-02-19 20:26:00.116] [INFO ] User registered: admin (ID: 1)
+[2026-02-19 20:26:00.116] [INFO ] Created default user: admin/admin123
+[2026-02-19 20:26:00.118] [INFO ] User registered: searchuser (ID: 2)
+[2026-02-19 20:26:00.147] [DEBUG] FTS table populated with existing data
+[2026-02-19 20:26:00.148] [DEBUG] Closing database...

@@ -196,7 +196,7 @@ void protected_endpoint(const httplib::Request& req,
 
 
 int main() {
-    setlocale(LC_ALL,"Russian");
+    setlocale(LC_ALL, "ru_RU.UTF-8");
     httplib::Server server;
     
     db = Database::getInstance();
@@ -717,55 +717,67 @@ int main() {
     });
 });
 
-        server.Get("/api/todos/search", [](const httplib::Request& req, httplib::Response& res) {
-            protected_endpoint(req, res, db,
-            [](const httplib::Request& req, httplib::Response& res, Database* db, int user_id, string username) {
+    server.Get("/api/todos/search", [](const httplib::Request& req, httplib::Response& res) {
+        protected_endpoint(req, res, db,
+        [](const httplib::Request& req, httplib::Response& res, Database* db, int user_id, string username) {
+        app_logger.debug("========== SEARCH ENDPOINT CALLED ==========");
+        
+        // ВСЕГДА устанавливаем заголовок
+        res.set_header("Content-Type", "application/json");
+        
+        string query = req.get_param_value("q");
+        string highlight_param = req.get_param_value("highlight");
+        bool highlight = (highlight_param == "true" || highlight_param == "1");
+        
+        app_logger.debug("Query: '" + query + "'");
+        app_logger.debug("Highlight: " + string(highlight ? "true" : "false"));
+        app_logger.debug("User ID: " + to_string(user_id));
+        app_logger.debug("Username: " + username);
+        
+        if (query.empty()) {
+            app_logger.error("Empty query");
+            res.status = 400;
+            res.set_content("{\"error\":\"Search query is required\",\"code\":400}", "application/json");
+            return;
+        }
+        
+        vector<Todo> results;
+        
+        try {
+            app_logger.debug("Calling db->searchTodos...");
+            results = db->searchTodos(user_id, query, highlight);
+            app_logger.debug("db->searchTodos returned " + to_string(results.size()) + " results");
             
-            string query = req.get_param_value("q");
-            string highlight_param = req.get_param_value("highlight");
-            bool highlight = (highlight_param == "true" || highlight_param == "1");
-            
-            if (query.empty()) {
-                res.status = 400;
-                res.set_content("{\"error\":\"Search query is required\",\"code\":400}", "application/json");
-                return;
+            if (!results.empty()) {
+                app_logger.debug("First result: ID=" + to_string(results[0].id) + 
+                               ", title='" + results[0].title + "'");
             }
-            app_logger.debug("Search request from user '" + username + "': \"" + query + "\"");
-            const char* check_sql = "SELECT name FROM sqlite_master WHERE type='table' AND name='todos_fts'";
-            sqlite3_stmt* check_stmt;
-            bool fts_table_exists = false;
             
-            if (sqlite3_prepare_v2(db->getRawDb(), check_sql, -1, &check_stmt, nullptr) == SQLITE_OK) {
-                if (sqlite3_step(check_stmt) == SQLITE_ROW) {
-                    fts_table_exists = true;
-                }
-                sqlite3_finalize(check_stmt);
-            }
-            
-            if (!fts_table_exists) {
-               
-                cerr << "FTS table not found, using LIKE fallback" << endl;
-                res.set_content("{\"error\":\"Full-text search is not available yet\",\"code\":501}", "application/json");
-                return;
-            }
-            
-            // Вызываем метод поиска
-            auto results = db->searchTodos(user_id, query, highlight);
-            
-            stringstream json;
-            json << "{";
-            json << "\"query\":\"" << escape_json(query) << "\",";
-            json << "\"count\":" << results.size() << ",";
-            json << "\"results\":[";
-            for (size_t i = 0; i < results.size(); ++i) {
-                json << results[i].to_json();
-                if (i != results.size() - 1) json << ",";
-            }
-            json << "]";
-            json << "}";
-            
-            res.set_content(json.str(), "application/json");
-            app_logger.debug("Search completed, found " + to_string(results.size()) + " results");
+        } catch (const std::exception& e) {
+            app_logger.error("EXCEPTION in searchTodos: " + string(e.what()));
+        } catch (...) {
+            app_logger.error("UNKNOWN EXCEPTION in searchTodos");
+        }
+        
+        stringstream json;
+        json << "{";
+        json << "\"query\":\"" << escape_json(query) << "\",";
+        json << "\"count\":" << results.size() << ",";
+        json << "\"results\":[";
+        
+        for (size_t i = 0; i < results.size(); ++i) {
+            if (i > 0) json << ",";
+            json << results[i].to_json();
+        }
+        json << "]}";
+        
+        string json_str = json.str();
+        app_logger.debug("JSON response length: " + to_string(json_str.length()));
+        app_logger.debug("JSON preview: " + json_str.substr(0, 200));
+        
+        res.set_content(json_str, "application/json");
+        app_logger.debug("Response sent successfully");
+        app_logger.debug("========== SEARCH ENDPOINT FINISHED ==========");
         });
     });
     app_logger.info("Server running on http://localhost:8080");
@@ -774,6 +786,6 @@ int main() {
     cout << "======================================" << endl;
     
     server.listen("0.0.0.0", 8080);
-    Database::cleanup();
+    //Database::cleanup();
     return 0;
 }

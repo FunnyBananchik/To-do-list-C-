@@ -193,7 +193,7 @@
             font-size: 1rem;
             transition: all 0.3s;
             padding-left: 45px;
-            padding-right: 120px;
+            padding-right: 140px;
         }
         
         .search-box:focus {
@@ -233,9 +233,25 @@
             background: #4c51bf;
         }
         
+        .search-operator-hint {
+            position: absolute;
+            right: 110px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #48bb78;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0.8;
+        }
+        
         .search-results-count {
             position: absolute;
-            right: 100px;
+            right: 110px;
             top: 50%;
             transform: translateY(-50%);
             background: #5a67d8;
@@ -433,7 +449,7 @@
         }
         
         .search-help li {
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
             gap: 5px;
@@ -448,6 +464,17 @@
             border: 1px solid #cbd5e0;
         }
         
+        .search-operator-badge {
+            display: inline-block;
+            background: #5a67d8;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 5px;
+        }
+        
         .search-operators {
             display: flex;
             gap: 10px;
@@ -456,17 +483,29 @@
         }
         
         .operator-btn {
-            padding: 6px 12px;
+            padding: 8px 15px;
             background: #e2e8f0;
             border: none;
-            border-radius: 15px;
-            font-size: 0.85rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
             cursor: pointer;
             transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
         
         .operator-btn:hover {
             background: #cbd5e0;
+        }
+        
+        .operator-btn.primary {
+            background: #5a67d8;
+            color: white;
+        }
+        
+        .operator-btn.primary:hover {
+            background: #4c51bf;
         }
         
         .search-examples {
@@ -478,7 +517,7 @@
         }
         
         .search-example-item {
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             display: flex;
             align-items: baseline;
             gap: 10px;
@@ -488,15 +527,22 @@
         .search-example-query {
             background: #5a67d8;
             color: white;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 0.85rem;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
             font-family: monospace;
         }
         
         .search-example-desc {
             color: #4a5568;
             font-size: 0.9rem;
+        }
+        
+        .search-example-note {
+            font-size: 0.85rem;
+            color: #718096;
+            margin-top: 8px;
+            font-style: italic;
         }
         
         .search-results-header {
@@ -868,6 +914,42 @@
                 }
             }
             
+            escapeHtml(text) {
+                if (!text) return '';
+                return String(text)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
+            
+            formatDate(dateString) {
+                if (!dateString) return 'Не указано';
+                try {
+                    let datePart = dateString;
+                    if (dateString.includes(' ')) {
+                        datePart = dateString.split(' ')[0];
+                    }
+                    
+                    const [year, month, day] = datePart.split('-');
+                    if (!year || !month || !day) return dateString;
+                    
+                    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                    
+                    if (isNaN(date.getTime())) return dateString;
+                    
+                    return date.toLocaleDateString('ru-RU', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                } catch (e) {
+                    console.error('Error formatting date:', e, dateString);
+                    return dateString;
+                }
+            }
+            
             async validateToken() {
                 try {
                     const response = await fetch(`${this.baseUrl}/api/validate`, {
@@ -876,17 +958,16 @@
                         }
                     });
                     
-                    if (response.ok) {
-                        const data = await response.json();
-                        if (data.valid) {
-                            this.currentUser = {
-                                id: data.user_id,
-                                username: data.username
-                            };
-                            this.loadData();
-                        } else {
-                            this.logout();
-                        }
+                    const data = await response.json();
+                    
+                    if (response.ok && data.valid) {
+                        this.currentUser = {
+                            id: data.user_id,
+                            username: data.username
+                        };
+                        await this.loadData();
+                        this.currentView = 'main';
+                        this.render();
                     } else {
                         this.logout();
                     }
@@ -897,13 +978,16 @@
             }
             
             async loadData() {
-                await Promise.all([
-                    this.fetchTodos(),
-                    this.fetchCategories(),
-                    this.fetchExpiringTodos(),
-                    this.fetchStats()
-                ]);
-                this.render();
+                try {
+                    await Promise.all([
+                        this.fetchTodos(),
+                        this.fetchCategories(),
+                        this.fetchExpiringTodos(),
+                        this.fetchStats()
+                    ]);
+                } catch (error) {
+                    console.error('Ошибка загрузки данных:', error);
+                }
             }
             
             async fetchTodos() {
@@ -934,12 +1018,23 @@
                         }
                     });
                     
+                    const data = await response.json();
+                    
                     if (response.ok) {
-                        this.todos = await response.json();
+                        this.todos = Array.isArray(data) ? data : [];
+                        
+                        if (this.filter === 'pending') {
+                            this.todos = this.todos.filter(t => !t.completed);
+                        } else if (this.filter === 'completed') {
+                            this.todos = this.todos.filter(t => t.completed);
+                        }
+                    } else {
+                        throw new Error(data.error || 'Ошибка загрузки задач');
                     }
                 } catch (error) {
                     console.error('Ошибка загрузки задач:', error);
                     this.showNotification('Ошибка загрузки задач', 'error');
+                    this.todos = [];
                 }
             }
             
@@ -951,11 +1046,17 @@
                         }
                     });
                     
+                    const data = await response.json();
+                    
                     if (response.ok) {
-                        this.categories = await response.json();
+                        this.categories = Array.isArray(data) ? data : [];
+                    } else {
+                        throw new Error(data.error || 'Ошибка загрузки категорий');
                     }
                 } catch (error) {
                     console.error('Ошибка загрузки категорий:', error);
+                    this.showNotification('Ошибка загрузки категорий', 'error');
+                    this.categories = [];
                 }
             }
             
@@ -967,11 +1068,16 @@
                         }
                     });
                     
+                    const data = await response.json();
+                    
                     if (response.ok) {
-                        this.expiringTodos = await response.json();
+                        this.expiringTodos = Array.isArray(data) ? data : [];
+                    } else {
+                        throw new Error(data.error || 'Ошибка загрузки истекающих задач');
                     }
                 } catch (error) {
                     console.error('Ошибка загрузки истекающих задач:', error);
+                    this.expiringTodos = [];
                 }
             }
             
@@ -983,15 +1089,30 @@
                         }
                     });
                     
+                    const data = await response.json();
+                    
                     if (response.ok) {
-                        this.stats = await response.json();
+                        this.stats = data;
+                    } else {
+                        throw new Error(data.error || 'Ошибка загрузки статистики');
                     }
                 } catch (error) {
                     console.error('Ошибка загрузки статистики:', error);
+                    this.stats = { total: 0, completed: 0, pending: 0 };
                 }
             }
             
-            // ИСПРАВЛЕННАЯ ФУНКЦИЯ ПОИСКА
+            // Функция для преобразования русских операторов в английские
+            convertRussianOperators(query) {
+                return query
+                    .replace(/\s+И\s+/gi, ' AND ')
+                    .replace(/\s+ИЛИ\s+/gi, ' OR ')
+                    .replace(/\s+НЕ\s+/gi, ' NOT ')
+                    .replace(/\s+AND\s+/gi, ' AND ')
+                    .replace(/\s+OR\s+/gi, ' OR ')
+                    .replace(/\s+NOT\s+/gi, ' NOT ');
+            }
+            
             async searchTodos(query) {
                 if (!query || query.trim().length < 2) {
                     this.searchResults = null;
@@ -1006,77 +1127,39 @@
                 this.render();
                 
                 try {
-                    // Сохраняем оригинальный запрос
-                    let ftsQuery = query;
+                    // Преобразуем русские операторы в английские
+                    const convertedQuery = this.convertRussianOperators(query);
+                    console.log('🔍 Original query:', query);
+                    console.log('🔍 Converted query:', convertedQuery);
                     
-                    // Сохраняем фразы в кавычках
-                    let preservedQuotes = [];
-                    let quoteCounter = 0;
-                    ftsQuery = ftsQuery.replace(/"([^"]*)"/g, function(match) {
-                        let placeholder = `__QUOTE_${quoteCounter}__`;
-                        preservedQuotes[quoteCounter] = match;
-                        quoteCounter++;
-                        return placeholder;
-                    });
-                    
-                    // Разбиваем на слова и обрабатываем операторы
-                    let words = ftsQuery.split(/\s+/);
-                    let processedWords = [];
-                    
-                    for (let i = 0; i < words.length; i++) {
-                        let word = words[i];
-                        
-                        // Пропускаем пустые слова
-                        if (!word.trim()) continue;
-                        
-                        // Проверяем операторы (в любом регистре)
-                        let upperWord = word.toUpperCase();
-                        if (upperWord === 'И' || upperWord === 'AND') {
-                            processedWords.push('AND');
-                        } else if (upperWord === 'ИЛИ' || upperWord === 'OR') {
-                            processedWords.push('OR');
-                        } else if (upperWord === 'НЕ' || upperWord === 'NOT') {
-                            processedWords.push('NOT');
-                        } else {
-                            processedWords.push(word);
-                        }
-                    }
-                    
-                    ftsQuery = processedWords.join(' ');
-                    
-                    // Восстанавливаем фразы в кавычках
-                    for (let i = 0; i < preservedQuotes.length; i++) {
-                        ftsQuery = ftsQuery.replace(`__QUOTE_${i}__`, preservedQuotes[i]);
-                    }
-                    
-                    // Логируем для отладки
-                    console.log('🔍 Оригинальный запрос:', query);
-                    console.log('🔍 FTS запрос:', ftsQuery);
-                    
-                    const response = await fetch(`${this.baseUrl}/api/todos/search?q=${encodeURIComponent(ftsQuery)}&highlight=true`, {
+                    const response = await fetch(`${this.baseUrl}/api/todos/search?q=${encodeURIComponent(convertedQuery)}&highlight=true`, {
                         headers: {
                             'Authorization': `Bearer ${this.token}`
                         }
                     });
                     
-                    if (response.ok) {
-                        const data = await response.json();
-                        this.searchResults = {
-                            query: query, // показываем исходный запрос
-                            ftsQuery: ftsQuery, // сохраняем для отладки
-                            count: data.count,
-                            results: data.results
-                        };
-                        
-                        this.addToSearchHistory(query);
-                        console.log(`✅ Найдено результатов: ${data.count}`);
-                    } else {
-                        const error = await response.json();
-                        throw new Error(error.error || 'Ошибка поиска');
+                    const data = await response.json();
+                    
+                    if (!response.ok) {
+                        throw new Error(data.error || `Ошибка ${response.status}`);
                     }
+                    
+                    this.searchResults = {
+                        query: query, // показываем исходный запрос
+                        convertedQuery: convertedQuery, // для отладки
+                        count: data.count || 0,
+                        results: data.results || []
+                    };
+                    
+                    if (this.searchResults.count > 0) {
+                        this.showNotification(`Найдено ${this.searchResults.count} задач`, 'success');
+                    }
+                    
+                    this.addToSearchHistory(query);
+                    
                 } catch (error) {
                     console.error('❌ Ошибка поиска:', error);
-                    this.showNotification(error.message || 'Ошибка поиска', 'error');
+                    this.showNotification(error.message, 'error');
                     this.searchResults = null;
                 }
                 
@@ -1085,6 +1168,7 @@
             }
             
             addToSearchHistory(query) {
+                if (!query) return;
                 this.searchHistory = this.searchHistory.filter(item => item !== query);
                 this.searchHistory.unshift(query);
                 if (this.searchHistory.length > 10) {
@@ -1110,8 +1194,9 @@
                         body: JSON.stringify({ username, password })
                     });
                     
+                    const data = await response.json();
+                    
                     if (response.ok) {
-                        const data = await response.json();
                         this.token = data.token;
                         localStorage.setItem('auth_token', this.token);
                         this.currentUser = {
@@ -1123,8 +1208,7 @@
                         this.currentView = 'main';
                         this.render();
                     } else {
-                        const error = await response.json();
-                        throw new Error(error.error || 'Ошибка входа');
+                        throw new Error(data.error || 'Ошибка входа');
                     }
                 } catch (error) {
                     this.showNotification(error.message, 'error');
@@ -1141,8 +1225,9 @@
                         body: JSON.stringify({ username, password })
                     });
                     
+                    const data = await response.json();
+                    
                     if (response.ok) {
-                        const data = await response.json();
                         this.token = data.token;
                         localStorage.setItem('auth_token', this.token);
                         this.currentUser = {
@@ -1154,8 +1239,7 @@
                         this.currentView = 'main';
                         this.render();
                     } else {
-                        const error = await response.json();
-                        throw new Error(error.error || 'Ошибка регистрации');
+                        throw new Error(data.error || 'Ошибка регистрации');
                     }
                 } catch (error) {
                     this.showNotification(error.message, 'error');
@@ -1189,19 +1273,25 @@
                             'Authorization': `Bearer ${this.token}`,
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify(todoData)
+                        body: JSON.stringify({
+                            title: todoData.title,
+                            description: todoData.description || '',
+                            priority: todoData.priority || 1,
+                            due_date: todoData.due_date || '',
+                            category_id: todoData.category_id || 0
+                        })
                     });
                     
+                    const data = await response.json();
+                    
                     if (response.ok) {
-                        const newTodo = await response.json();
-                        this.todos.unshift(newTodo);
+                        this.todos.unshift(data);
                         this.showNotification('Задача создана!', 'success');
                         await this.fetchStats();
                         await this.fetchExpiringTodos();
                         return true;
                     } else {
-                        const error = await response.json();
-                        throw new Error(error.error || 'Ошибка создания задачи');
+                        throw new Error(data.error || 'Ошибка создания задачи');
                     }
                 } catch (error) {
                     this.showNotification(error.message, 'error');
@@ -1217,14 +1307,24 @@
                             'Authorization': `Bearer ${this.token}`,
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify(todoData)
+                        body: JSON.stringify({
+                            id: todoData.id,
+                            title: todoData.title,
+                            description: todoData.description || '',
+                            completed: todoData.completed || false,
+                            priority: todoData.priority || 1,
+                            due_date: todoData.due_date || '',
+                            category_id: todoData.category_id || 0,
+                            user_id: this.currentUser.id
+                        })
                     });
                     
+                    const data = await response.json();
+                    
                     if (response.ok) {
-                        const updatedTodo = await response.json();
                         const index = this.todos.findIndex(t => t.id === todoData.id);
                         if (index !== -1) {
-                            this.todos[index] = updatedTodo;
+                            this.todos[index] = data;
                         }
                         this.showNotification('Задача обновлена!', 'success');
                         await this.fetchStats();
@@ -1236,8 +1336,7 @@
                         
                         return true;
                     } else {
-                        const error = await response.json();
-                        throw new Error(error.error || 'Ошибка обновления задачи');
+                        throw new Error(data.error || 'Ошибка обновления задачи');
                     }
                 } catch (error) {
                     this.showNotification(error.message, 'error');
@@ -1253,17 +1352,20 @@
                             'Authorization': `Bearer ${this.token}`,
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify(categoryData)
+                        body: JSON.stringify({
+                            name: categoryData.name,
+                            color: categoryData.color
+                        })
                     });
                     
+                    const data = await response.json();
+                    
                     if (response.ok) {
-                        const newCategory = await response.json();
-                        this.categories.push(newCategory);
+                        this.categories.push(data);
                         this.showNotification('Категория создана!', 'success');
                         return true;
                     } else {
-                        const error = await response.json();
-                        throw new Error(error.error || 'Ошибка создания категории');
+                        throw new Error(data.error || 'Ошибка создания категории');
                     }
                 } catch (error) {
                     this.showNotification(error.message, 'error');
@@ -1311,10 +1413,13 @@
                         
                         this.showNotification('Категория удалена', 'success');
                         this.render();
+                    } else {
+                        const error = await response.json().catch(() => ({ error: 'Unknown error' }));
+                        throw new Error(error.error || 'Ошибка удаления категории');
                     }
                 } catch (error) {
                     console.error('Ошибка удаления категории:', error);
-                    this.showNotification('Ошибка удаления категории', 'error');
+                    this.showNotification(error.message, 'error');
                 }
             }
             
@@ -1327,11 +1432,12 @@
                         }
                     });
                     
+                    const data = await response.json();
+                    
                     if (response.ok) {
-                        const updatedTodo = await response.json();
                         const index = this.todos.findIndex(t => t.id === id);
                         if (index !== -1) {
-                            this.todos[index] = updatedTodo;
+                            this.todos[index] = data;
                         }
                         await this.fetchStats();
                         await this.fetchExpiringTodos();
@@ -1342,9 +1448,11 @@
                         
                         this.render();
                         return true;
+                    } else {
+                        throw new Error(data.error || 'Ошибка обновления задачи');
                     }
                 } catch (error) {
-                    this.showNotification('Ошибка обновления задачи', 'error');
+                    this.showNotification(error.message, 'error');
                     return false;
                 }
             }
@@ -1371,9 +1479,12 @@
                         }
                         
                         this.render();
+                    } else {
+                        const error = await response.json().catch(() => ({ error: 'Unknown error' }));
+                        throw new Error(error.error || 'Ошибка удаления задачи');
                     }
                 } catch (error) {
-                    this.showNotification('Ошибка удаления задачи', 'error');
+                    this.showNotification(error.message, 'error');
                 }
             }
             
@@ -1400,19 +1511,47 @@
             
             isOverdue(todo) {
                 if (!todo.due_date || todo.completed) return false;
-                const dueDate = new Date(todo.due_date);
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                return dueDate < today;
+                try {
+                    let dueDateStr = todo.due_date;
+                    if (dueDateStr.includes(' ')) {
+                        dueDateStr = dueDateStr.split(' ')[0];
+                    }
+                    
+                    const [year, month, day] = dueDateStr.split('-');
+                    if (!year || !month || !day) return false;
+                    
+                    const dueDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    
+                    return dueDate < today;
+                } catch (e) {
+                    return false;
+                }
             }
             
             isExpiring(todo) {
                 if (!todo.due_date || todo.completed || this.isOverdue(todo)) return false;
-                const dueDate = new Date(todo.due_date);
-                const today = new Date();
-                const threeDaysFromNow = new Date();
-                threeDaysFromNow.setDate(today.getDate() + 3);
-                return dueDate <= threeDaysFromNow;
+                try {
+                    let dueDateStr = todo.due_date;
+                    if (dueDateStr.includes(' ')) {
+                        dueDateStr = dueDateStr.split(' ')[0];
+                    }
+                    
+                    const [year, month, day] = dueDateStr.split('-');
+                    if (!year || !month || !day) return false;
+                    
+                    const dueDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    
+                    const threeDaysFromNow = new Date(today);
+                    threeDaysFromNow.setDate(today.getDate() + 3);
+                    
+                    return dueDate <= threeDaysFromNow && dueDate >= today;
+                } catch (e) {
+                    return false;
+                }
             }
             
             getStatusBadge(todo) {
@@ -1453,20 +1592,6 @@
                     5: 'Критичный'
                 };
                 return priorities[priority] || `Приоритет: ${priority}`;
-            }
-            
-            formatDate(dateString) {
-                if (!dateString) return 'Не указано';
-                try {
-                    const date = new Date(dateString);
-                    return date.toLocaleDateString('ru-RU', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                    });
-                } catch (e) {
-                    return dateString;
-                }
             }
             
             toggleCategoryFilter(categoryId) {
@@ -1541,8 +1666,7 @@
                         </form>
                         
                         <div style="margin-top: 20px; text-align: center; color: #718096; font-size: 0.9rem;">
-                            <p>Тестовый пользователь:</p>
-                            <p><strong>admin / admin123</strong></p>
+                            <p>Тестовый пользователь: <strong>admin / admin123</strong></p>
                         </div>
                     </div>
                 `;
@@ -1564,22 +1688,23 @@
                                 <input type="text" 
                                        class="search-box" 
                                        id="searchBox"
-                                       placeholder="Введите поисковый запрос..." 
-                                       value="${this.searchQuery || ''}"
+                                       placeholder="Например: купить И молоко НЕ хлеб" 
+                                       value="${this.escapeHtml(this.searchQuery || '')}"
                                        autocomplete="off">
-                                <button class="search-button" id="searchButton">
-                                    <i class="fas fa-search"></i> Найти
-                                </button>
+                                ${!isSearchMode ? '<span class="search-operator-hint">И, ИЛИ, НЕ</span>' : ''}
                                 ${isSearchMode ? `
                                     <div class="search-results-count">
                                         ${this.searchResults.count || 0}
                                     </div>
                                 ` : ''}
+                                <button class="search-button" id="searchButton">
+                                    <i class="fas fa-search"></i> Найти
+                                </button>
                             </div>
                             
                             <div class="user-info">
                                 <i class="fas fa-user-circle"></i>
-                                ${this.currentUser?.username || 'Пользователь'}
+                                ${this.escapeHtml(this.currentUser?.username || 'Пользователь')}
                                 <span class="debug-toggle" onclick="window.todoApp.toggleDebug()">
                                     <i class="fas fa-bug"></i>
                                 </span>
@@ -1589,11 +1714,11 @@
                             </div>
                         </header>
                         
-                        ${this.debugMode && isSearchMode && this.searchResults.ftsQuery ? `
+                        ${this.debugMode && isSearchMode && this.searchResults.convertedQuery ? `
                             <div class="debug-panel visible">
                                 <strong>🔍 Отладка поиска:</strong><br>
-                                Оригинальный запрос: <code>${this.searchResults.query}</code><br>
-                                FTS запрос: <code>${this.searchResults.ftsQuery}</code><br>
+                                Исходный запрос: <code>${this.escapeHtml(this.searchResults.query)}</code><br>
+                                Преобразованный: <code>${this.escapeHtml(this.searchResults.convertedQuery)}</code><br>
                                 Результатов: ${this.searchResults.count}
                             </div>
                         ` : ''}
@@ -1638,7 +1763,7 @@
                                             <select class="form-select" id="todoCategory">
                                                 <option value="0">Без категории</option>
                                                 ${this.categories.map(cat => `
-                                                    <option value="${cat.id}">${cat.name}</option>
+                                                    <option value="${cat.id}">${this.escapeHtml(cat.name)}</option>
                                                 `).join('')}
                                             </select>
                                         </div>
@@ -1654,55 +1779,70 @@
                                     <h2><i class="fas fa-search"></i> Расширенный поиск</h2>
                                     
                                     <div class="search-help">
-                                        <h4>📝 Как использовать операторы:</h4>
+                                        <h4>📝 Русские операторы:</h4>
                                         <ul>
-                                            <li><i class="fas fa-check-circle" style="color: #48bb78;"></i> <strong>AND / И</strong> - оба слова должны присутствовать</li>
-                                            <li><i class="fas fa-check-circle" style="color: #48bb78;"></i> <strong>OR / ИЛИ</strong> - хотя бы одно слово</li>
-                                            <li><i class="fas fa-check-circle" style="color: #48bb78;"></i> <strong>NOT / НЕ</strong> - исключить слово</li>
-                                            <li><i class="fas fa-check-circle" style="color: #48bb78;"></i> <strong>"фраза в кавычках"</strong> - точное совпадение</li>
-                                            <li><i class="fas fa-check-circle" style="color: #48bb78;"></i> <strong>слово*</strong> - префиксный поиск</li>
+                                            <li>
+                                                <span class="search-operator-badge">И</span>
+                                                <span class="search-operator-badge" style="background: #48bb78;">AND</span>
+                                                <strong>И</strong> - оба слова должны присутствовать
+                                                <br><small><code>купить И молоко</code></small>
+                                            </li>
+                                            <li>
+                                                <span class="search-operator-badge">ИЛИ</span>
+                                                <span class="search-operator-badge" style="background: #48bb78;">OR</span>
+                                                <strong>ИЛИ</strong> - хотя бы одно слово
+                                                <br><small><code>купить ИЛИ работа</code></small>
+                                            </li>
+                                            <li>
+                                                <span class="search-operator-badge">НЕ</span>
+                                                <span class="search-operator-badge" style="background: #48bb78;">NOT</span>
+                                                <strong>НЕ</strong> - исключить слово
+                                                <br><small><code>купить НЕ молоко</code></small>
+                                            </li>
+                                            <li>
+                                                <i class="fas fa-quote-right"></i>
+                                                <strong>"фраза в кавычках"</strong> - точное совпадение
+                                                <br><small><code>"купить молоко"</code></small>
+                                            </li>
+                                            <li>
+                                                <i class="fas fa-asterisk"></i>
+                                                <strong>слово*</strong> - префиксный поиск
+                                                <br><small><code>куп*</code></small>
+                                            </li>
                                         </ul>
                                         
                                         <div class="search-examples">
-                                            <h4>🎯 Примеры запросов:</h4>
+                                            <h4>🎯 Примеры с русскими операторами:</h4>
                                             <div class="search-example-item">
-                                                <span class="search-example-query">купить AND молоко</span>
+                                                <span class="search-example-query">купить И молоко</span>
                                                 <span class="search-example-desc">найдет задачи, где есть оба слова</span>
                                             </div>
                                             <div class="search-example-item">
-                                                <span class="search-example-query">купить OR работа</span>
+                                                <span class="search-example-query">купить ИЛИ работа</span>
                                                 <span class="search-example-desc">найдет задачи с любым из слов</span>
                                             </div>
                                             <div class="search-example-item">
-                                                <span class="search-example-query">купить NOT молоко</span>
+                                                <span class="search-example-query">купить НЕ молоко</span>
                                                 <span class="search-example-desc">исключит задачи со словом "молоко"</span>
                                             </div>
                                             <div class="search-example-item">
-                                                <span class="search-example-query">"купить молоко"</span>
-                                                <span class="search-example-desc">точная фраза</span>
-                                            </div>
-                                            <div class="search-example-item">
-                                                <span class="search-example-query">куп*</span>
-                                                <span class="search-example-desc">слова, начинающиеся с "куп"</span>
-                                            </div>
-                                            <div class="search-example-item">
-                                                <span class="search-example-query">купить AND молоко NOT хлеб</span>
+                                                <span class="search-example-query">купить И молоко НЕ хлеб</span>
                                                 <span class="search-example-desc">комбинация операторов</span>
                                             </div>
                                         </div>
                                         
                                         <div class="search-operators">
+                                            <button class="operator-btn" data-operator="купить И молоко">
+                                                <i class="fas fa-check-circle"></i> И
+                                            </button>
+                                            <button class="operator-btn" data-operator="купить ИЛИ работа">
+                                                <i class="fas fa-check-circle"></i> ИЛИ
+                                            </button>
+                                            <button class="operator-btn" data-operator="купить НЕ молоко">
+                                                <i class="fas fa-times-circle"></i> НЕ
+                                            </button>
                                             <button class="operator-btn" data-operator='"купить молоко"'>
                                                 <i class="fas fa-quote-left"></i> Фраза
-                                            </button>
-                                            <button class="operator-btn" data-operator="купить AND молоко">
-                                                AND / И
-                                            </button>
-                                            <button class="operator-btn" data-operator="купить OR работа">
-                                                OR / ИЛИ
-                                            </button>
-                                            <button class="operator-btn" data-operator="купить NOT молоко">
-                                                NOT / НЕ
                                             </button>
                                             <button class="operator-btn" data-operator="куп*">
                                                 <i class="fas fa-asterisk"></i> Префикс
@@ -1715,8 +1855,8 @@
                                             <h4><i class="fas fa-history"></i> История поиска:</h4>
                                             <div class="search-operators">
                                                 ${this.searchHistory.map(query => `
-                                                    <button class="operator-btn" data-history="${query.replace(/"/g, '&quot;')}">
-                                                        ${query.length > 20 ? query.substring(0, 20) + '...' : query}
+                                                    <button class="operator-btn" data-history="${this.escapeHtml(query)}">
+                                                        ${this.escapeHtml(query.length > 20 ? query.substring(0, 20) + '...' : query)}
                                                     </button>
                                                 `).join('')}
                                             </div>
@@ -1744,9 +1884,9 @@
                                         ` : this.categories.map(cat => `
                                             <div class="category-item" style="border-left-color: ${cat.color}">
                                                 <div class="category-color" style="background-color: ${cat.color}"></div>
-                                                <div style="font-weight: 600;">${cat.name}</div>
+                                                <div style="font-weight: 600;">${this.escapeHtml(cat.name)}</div>
                                                 <div class="category-actions">
-                                                    <button class="btn btn-sm btn-danger" data-category-id="${cat.id}" data-category-name="${cat.name}" data-action="delete-category">
+                                                    <button class="btn btn-sm btn-danger" data-category-id="${cat.id}" data-category-name="${this.escapeHtml(cat.name)}" data-action="delete-category">
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 </div>
@@ -1780,7 +1920,7 @@
                                             <div style="margin-top: 10px; max-height: 150px; overflow-y: auto;">
                                                 ${this.expiringTodos.slice(0, 3).map(todo => `
                                                     <div style="background: #f6ad55; color: white; padding: 8px; border-radius: 5px; margin-bottom: 5px; font-size: 0.9rem;">
-                                                        <div style="font-weight: bold;">${todo.title}</div>
+                                                        <div style="font-weight: bold;">${this.escapeHtml(todo.title)}</div>
                                                         <div style="font-size: 0.8rem;">
                                                             Срок: ${this.formatDate(todo.due_date)} | ${this.getPriorityText(todo.priority)}
                                                         </div>
@@ -1812,7 +1952,7 @@
                                         ${isSearchMode ? `
                                             <div class="search-info">
                                                 <span>Найдено: <strong>${this.searchResults?.count || 0}</strong> задач</span>
-                                                <span style="color: #718096;">по запросу: <strong>"${this.searchResults?.query || ''}"</strong></span>
+                                                <span style="color: #718096;">по запросу: <strong>"${this.escapeHtml(this.searchResults?.query || '')}"</strong></span>
                                                 <button class="btn btn-sm btn-info" id="clearSearchBtn">
                                                     <i class="fas fa-times"></i> Очистить
                                                 </button>
@@ -1875,7 +2015,7 @@
                                                         data-category-id="${cat.id}"
                                                         style="${this.selectedCategoryIds.includes(cat.id) ? `border-color: ${cat.color};` : ''}">
                                                     <div class="category-filter-color" style="background-color: ${cat.color}"></div>
-                                                    ${cat.name}
+                                                    ${this.escapeHtml(cat.name)}
                                                     ${this.selectedCategoryIds.includes(cat.id) ? '<i class="fas fa-check"></i>' : ''}
                                                 </button>
                                             `).join('')}
@@ -2019,7 +2159,7 @@
                                     
                                     <div class="form-group">
                                         <label>Срок выполнения</label>
-                                        <input type="date" class="form-input" id="editTodoDueDate" value="${this.editingTodo.due_date || ''}">
+                                        <input type="date" class="form-input" id="editTodoDueDate" value="${this.editingTodo.due_date ? this.editingTodo.due_date.split(' ')[0] : ''}">
                                     </div>
                                 </div>
                                 
@@ -2053,16 +2193,6 @@
                     </div>
                     ` : ''}
                 `;
-            }
-            
-            escapeHtml(text) {
-                if (!text) return '';
-                return String(text)
-                    .replace(/&/g, '&amp;')
-                    .replace(/</g, '&lt;')
-                    .replace(/>/g, '&gt;')
-                    .replace(/"/g, '&quot;')
-                    .replace(/'/g, '&#039;');
             }
             
             renderHighlightedText(text) {

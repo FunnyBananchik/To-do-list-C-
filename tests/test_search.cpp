@@ -27,7 +27,7 @@ protected:
     
     void TearDown() override {
         db->close();
-        Database::cleanup();
+        //Database::cleanup();
         unlink("search_test.db");
     }
     

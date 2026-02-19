@@ -30,18 +30,20 @@ class Database {
         Database() : db(nullptr) {}
     public:
         static Database* getInstance() {
-            if (!instance) {
-             instance = new Database();
-            }
-            return instance;
+            static Database instance;  // Статическая локальная переменная (инициализируется при первом вызове)
+            return &instance;
         } 
 
-        static void cleanup() {
+        Database(const Database&) = delete;
+        Database& operator=(const Database&) = delete;
+
+        /*static void cleanup() {
             if (instance) {
                 delete instance;
                 instance = nullptr;
             }
         }
+            */
         
         bool open(const string& path) {
             db_path = path;
@@ -90,9 +92,7 @@ class Database {
                 title,
                 description,
                 content='todos',
-                content_rowid='rowid',
-                tokenize = 'unicode61 remove_diacritics 1 tokenchars ''абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ''',
-                prefix='2,3'
+                content_rowid='rowid'
                 );
             )";
         
@@ -136,11 +136,13 @@ class Database {
                 createDefaultUser();
             }
 
-                return true;
+            return true;
+            //populateFtsTable();
         }
 
         void close() {
             if (db) {
+                 app_logger.debug("Closing database...");
                  sqlite3_close(db);
                 db = nullptr;
             }
@@ -161,24 +163,35 @@ class Database {
             }
         }
 
-        void checkAndPopulateFtsTable() {
-        // Проверяем, существует ли таблица FTS5
-        const char* check_sql = "SELECT name FROM sqlite_master WHERE type='table' AND name='todos_fts'";
+    void checkAndPopulateFtsTable() {
+        const char* check_fts = "SELECT name FROM sqlite_master WHERE type='table' AND name='todos_fts';";
         sqlite3_stmt* stmt;
-        
-        if (sqlite3_prepare_v2(db, check_sql, -1, &stmt, nullptr) != SQLITE_OK) {
-            app_logger.error("Failed to check FTS table: ");
-            return;
-        }
-        
         bool fts_exists = false;
-        if (sqlite3_step(stmt) == SQLITE_ROW) {
-            fts_exists = true;
-        }
-        sqlite3_finalize(stmt);
         
+        if (sqlite3_prepare_v2(db, check_fts, -1, &stmt, nullptr) == SQLITE_OK) {
+            if (sqlite3_step(stmt) == SQLITE_ROW) {
+                fts_exists = true;
+            }
+            sqlite3_finalize(stmt);
+        }
+        
+        if (fts_exists) {
+            // Тестируем FTS простым запросом
+            const char* test_fts = "SELECT rowid FROM todos_fts LIMIT 1;";
+            int rc = sqlite3_prepare_v2(db, test_fts, -1, &stmt, nullptr);
+            
+            if (rc != SQLITE_OK) {
+                app_logger.error("FTS table is corrupted, recreating...");
+                
+                // Удаляем поврежденную FTS
+                sqlite3_exec(db, "DROP TABLE IF EXISTS todos_fts;", nullptr, nullptr, nullptr);
+                fts_exists = false;
+            }
+            sqlite3_finalize(stmt);
+        }
+        
+        // Если FTS нет или была повреждена - создаем заново
         if (!fts_exists) {
-            app_logger.debug("FTS table not found, creating...");
             const char* create_fts = R"(
                 CREATE VIRTUAL TABLE todos_fts USING fts5(
                     id UNINDEXED,
@@ -187,19 +200,23 @@ class Database {
                     description,
                     content='todos',
                     content_rowid='rowid'
-
-                )
+                );
             )";
             
             char* errMsg = nullptr;
             if (sqlite3_exec(db, create_fts, nullptr, nullptr, &errMsg) != SQLITE_OK) {
-                app_logger.error("Failed to create FTS table: ");
+                app_logger.error("Failed to create FTS table: " + string(errMsg));
                 sqlite3_free(errMsg);
-                return;
+            } else {
+                // Переиндексируем все существующие задачи
+                const char* index_sql = R"(
+                    INSERT INTO todos_fts(rowid, id, user_id, title, description)
+                    SELECT rowid, id, user_id, title, description FROM todos;
+                )";
+                sqlite3_exec(db, index_sql, nullptr, nullptr, nullptr);
+                app_logger.info("FTS table recreated and populated");
             }
-            app_logger.debug("FTS table created");
         }
-            populateFtsTable();
         }
 
 
@@ -1128,6 +1145,6 @@ vector<string> extractSearchTermsSimple(const string& query) {
 };
 
 //Database* Database::instance = nullptr;
-inline static Database* instance = nullptr;
+//inline static Database* instance = nullptr;
 
 #endif
